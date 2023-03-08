@@ -218,16 +218,27 @@ $(document).on('click', '#solvebtn', function () {
     }
 
     let avoiding = []
+    let containing = []
     patterns.forEach((element, index) => {
-        avoiding[index] = element.permutation.split(",");
-        avoiding[index].forEach((e, i) => {
-            avoiding[index][i] = parseInt(e);
-        })
+        if(element.containment === "Containment") {
+            containing[containing.length] = element.permutation.split(",");
+            containing[containing.length - 1].forEach((e, i) => {
+                containing[containing.length - 1][i] = parseInt(e);
+            })
+        }
+        else {
+            avoiding[avoiding.length] = element.permutation.split(",");
+            avoiding[avoiding.length - 1].forEach((e, i) => {
+                avoiding[avoiding.length - 1][i] = parseInt(e);
+            })
+        }
+       
     });
+
 
     var length = document.getElementById("length").value
 
-    var data = JSON.stringify({ length: parseInt(length), classic_avoidance: avoiding })
+    var data = JSON.stringify({ length: parseInt(length), classic_avoidance: avoiding, classic_containment: containing })
 
     fetch("solve", {
         method: 'POST', headers: {

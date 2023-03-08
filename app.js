@@ -32,7 +32,6 @@ app.get("/", (req, res) => {
 
 app.post("/solve", (req, res) => {
     const model = fs.readFileSync("combined.essence", 'utf8');
-
     const data = {
         model: model,
         data: JSON.stringify(Object.assign(emptyData, JSON.parse(req.body.data))),
@@ -40,7 +39,7 @@ app.post("/solve", (req, res) => {
         conjure_options: ["--number-of-solutions", "5"]
     }
 
-   console.log(data.data);
+    console.log(data.data);
     const url = 'https://demos.constraintmodelling.org/server/submit'
 
     axios
@@ -51,8 +50,8 @@ app.post("/solve", (req, res) => {
             },
         })
         .then((response) => {
-            console.log(`Status: ${response.status}`);
-            console.log('Body: ', response.data);
+            // console.log(`Status: ${response.status}`);
+            // console.log('Body: ', response.data);
             res.json(response.data);
 
         }).catch((err) => {
