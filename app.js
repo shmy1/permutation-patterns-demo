@@ -22,23 +22,25 @@ hbs.registerHelper('isEqual', function (option, value) {
     return Number(value) === Number(option);
 });
 
+require('dotenv').config()
 
+const emptyData = require('./empty.json')
 
 app.get("/", (req, res) => {
     res.render('index')
 })
 
 app.post("/solve", (req, res) => {
-    const model = fs.readFileSync("classic-avoidance.essence", 'utf8');
-
+    const model = fs.readFileSync("combined.essence", 'utf8');
 
     const data = {
         model: model,
-        data: req.body.data.toString(),
+        data: JSON.stringify(Object.assign(emptyData, JSON.parse(req.body.data))),
         solver: "minion",
-        conjure_options: ["--number-of-solutions", "all"]
+        conjure_options: ["--number-of-solutions", "5"]
     }
 
+   console.log(data.data);
     const url = 'https://demos.constraintmodelling.org/server/submit'
 
     axios

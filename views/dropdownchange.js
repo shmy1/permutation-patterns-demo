@@ -66,7 +66,8 @@ function updatePatternText(id, permutation) {
 }
 
 function setPatternChoices() {
-    $.each(window.representation, function (i, item) {
+    var representations = JSON.parse(`${environment.representation}`)
+    $.each(representations, function (i, item) {
         $('#permrepresentation').append($('<option>', {
             value: i,
             text: item
@@ -130,12 +131,6 @@ window.addEventListener('popstate', function (event) {
 
 });
 
-// var clickedSquares = []
-// function isValidBoxedMesh() {
-
-// }
-
-
 
 $(document).on('click', '#addpatternbtn', function () {
     var url = new URL(document.location);
@@ -167,12 +162,20 @@ $(document).on('click', '#addpatternbtn', function () {
 
     if ($(this).val() === "add") {
         var patternnumber = sessionStorage.length
-        sessionStorage.setItem(
-            patternnumber,
-            pattern
-        );
+        if(patternnumber >= `${environment.max_patterns}`){
+            console.log($('#maxPatterns'))
+            $('#maxPatterns').modal('show');
+        }
+        else {
+            sessionStorage.setItem(
+                patternnumber,
+                pattern
+            );
+            addNewPattern(patternnumber, pattern);
+        }
+       
 
-        addNewPattern(patternnumber, pattern);
+       
     }
 
     else {
@@ -188,18 +191,6 @@ $(document).on('click', '#addpatternbtn', function () {
 
 
     resetParams(url, urlParams);
-
-
-
-    // console.log(document.getElementById("added-patterns-container").childElementCount)
-
-    // console.log(squares)
-
-
-
-    // console.log(clickedSquares)
-
-
 
 });
 
@@ -228,7 +219,7 @@ $(document).on('click', '#solvebtn', function () {
 
     let avoiding = []
     patterns.forEach((element, index) => {
-        avoiding[index] = patterns[index].permutation.split(",");
+        avoiding[index] = element.permutation.split(",");
         avoiding[index].forEach((e, i) => {
             avoiding[index][i] = parseInt(e);
         })
@@ -236,7 +227,7 @@ $(document).on('click', '#solvebtn', function () {
 
     var length = document.getElementById("length").value
 
-    var data = JSON.stringify({ length: parseInt(length), avoiding: avoiding })
+    var data = JSON.stringify({ length: parseInt(length), classic_avoidance: avoiding })
 
     fetch("solve", {
         method: 'POST', headers: {
