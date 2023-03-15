@@ -201,6 +201,7 @@ $(document).on('click', '.pattern-input', function (e) {
         urlParams.set('id', patternid);
         urlParams.set('permutation', pattern.permutation)
         urlParams.set('representation', pattern.patterntype)
+        urlParams.set('containment', pattern.containment)
     
         window.history.pushState({}, '', url);
 
@@ -221,6 +222,7 @@ $(document).on('click', '.pattern-input', function (e) {
     else {
         urlParams.delete("permutation")
         urlParams.delete("id")
+        urlParams.delete("containment")
         $(this).parent().removeClass("selected-pattern")
         $(this).prop("checked" ,false)
         // checkbox.removeAttr("checked")

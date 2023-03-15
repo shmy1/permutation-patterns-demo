@@ -6,6 +6,7 @@ function setup() {
     setPermutationElements();
     setPatternChoices();
     setPatternType();
+    setPropertyChoices();
     sessionStorage.clear();
 }
 
@@ -95,6 +96,7 @@ function setPatternType() {
 function resetParams(url, urlParams) {
     urlParams.delete("id")
     urlParams.delete("permutation")
+    urlParams.delete("containment")
     urlParams.set('representation', 1);
     window.history.pushState({}, '', url);
     dispatchEvent(new PopStateEvent('popstate', {}));
@@ -104,6 +106,14 @@ function resetParams(url, urlParams) {
 $(document).on('change', '#permrepresentation', function () {
     var currenturl = new URL(window.location);
     currenturl.searchParams.set('representation', $('#permrepresentation').find("option:selected").attr('value'));
+    window.history.pushState({}, '', currenturl);
+    dispatchEvent(new PopStateEvent('popstate', {}));
+}
+);
+
+$(document).on('change', '#include', function () {
+    var currenturl = new URL(window.location);
+    currenturl.searchParams.set("containment",$('#include input:checked').attr("value"));
     window.history.pushState({}, '', currenturl);
     dispatchEvent(new PopStateEvent('popstate', {}));
 }
@@ -220,7 +230,7 @@ $(document).on('click', '#solvebtn', function () {
     let avoiding = []
     let containing = []
     patterns.forEach((element, index) => {
-        if(element.containment === "Containment") {
+        if(element.containment === "c") {
             containing[containing.length] = element.permutation.split(",");
             containing[containing.length - 1].forEach((e, i) => {
                 containing[containing.length - 1][i] = parseInt(e);
@@ -259,3 +269,47 @@ function getResult(id) {
     window.location.assign("/result?id=" + id);
 
 }
+
+function setPropertyChoices() {
+    var properties = JSON.parse(`${environment.properties}`)
+    $.each(properties, function (i, item) {
+        
+        var input = document.createElement("input")
+        input.classList.add("form-check-input")
+        input.setAttribute("type", "checkbox")
+        input.setAttribute("name", "property")
+        input.setAttribute("id", i)
+        input.setAttribute("value", i)
+        
+        var label = document.createElement("label")
+        label.classList.add("form-check-label")
+        label.appendChild(input)
+        label.appendChild(document.createTextNode(item))
+
+        var div = document.createElement("div")
+        div.classList.add("form-check-inline")
+        div.appendChild(label)
+        $('#property_choices').append(div);
+
+    });
+
+}
+
+
+$(document).on('change', ':checkbox', function () {
+    if($(this).attr("id") === "all-property") {
+        var check = false;
+        if($("#all-property").is(':checked')) {
+           check = true;
+        }
+        $('input:checkbox[id^="prop_"]').each(function(){
+            $(this).prop('checked', check);
+        });
+    }
+
+    else if ($(this).not(':checked')){
+        $("#all-property").prop('checked', false);
+    }
+  
+}
+);

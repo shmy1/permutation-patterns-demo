@@ -367,8 +367,8 @@ such that prop_mins_decomposable ->
 $ perm is an involution
 $ perm * perm = id
 
-given prob_involution : bool
-such that prob_involution ->
+given prop_involution : bool
+such that prop_involution ->
     forAll i : int(1..length) .
         perm(perm(i)) = i
 
@@ -376,8 +376,8 @@ such that prob_involution ->
 
 
 
-given prob_derangement : bool
-such that prob_derangement ->
+given prop_derangement : bool
+such that prop_derangement ->
     forAll i : int(1..length) .
         perm(i) != i
 
