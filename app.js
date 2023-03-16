@@ -36,7 +36,7 @@ app.post("/solve", (req, res) => {
         model: model,
         data: JSON.stringify(Object.assign(emptyData, JSON.parse(req.body.data))),
         solver: "minion",
-        conjure_options: ["--number-of-solutions", "5"]
+        conjure_options: ["--number-of-solutions", "all"]
     }
 
     console.log(data.data);

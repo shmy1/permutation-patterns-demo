@@ -76,11 +76,11 @@ function setPatternChoices() {
     });
 
     var currenturl = new URL(window.location);
-    if(window.location.pathname === "/") {
+    if (window.location.pathname === "/") {
         currenturl.searchParams.set('representation', 1);
         window.history.pushState({}, '', currenturl);
     }
-    
+
 }
 
 function setPatternType() {
@@ -113,7 +113,7 @@ $(document).on('change', '#permrepresentation', function () {
 
 $(document).on('change', '#include', function () {
     var currenturl = new URL(window.location);
-    currenturl.searchParams.set("containment",$('#include input:checked').attr("value"));
+    currenturl.searchParams.set("containment", $('#include input:checked').attr("value"));
     window.history.pushState({}, '', currenturl);
     dispatchEvent(new PopStateEvent('popstate', {}));
 }
@@ -172,7 +172,7 @@ $(document).on('click', '#addpatternbtn', function () {
 
     if ($(this).val() === "add") {
         var patternnumber = sessionStorage.length
-        if(patternnumber >= `${environment.max_patterns}`){
+        if (patternnumber >= `${environment.max_patterns}`) {
             console.log($('#maxPatterns'))
             $('#maxPatterns').modal('show');
         }
@@ -183,9 +183,9 @@ $(document).on('click', '#addpatternbtn', function () {
             );
             addNewPattern(patternnumber, pattern);
         }
-       
 
-       
+
+
     }
 
     else {
@@ -226,29 +226,11 @@ $(document).on('click', '#solvebtn', function () {
     for (let i = 0; i < numberPatterns; i++) {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
-
-    let avoiding = []
-    let containing = []
-    patterns.forEach((element, index) => {
-        if(element.containment === "c") {
-            containing[containing.length] = element.permutation.split(",");
-            containing[containing.length - 1].forEach((e, i) => {
-                containing[containing.length - 1][i] = parseInt(e);
-            })
-        }
-        else {
-            avoiding[avoiding.length] = element.permutation.split(",");
-            avoiding[avoiding.length - 1].forEach((e, i) => {
-                avoiding[avoiding.length - 1][i] = parseInt(e);
-            })
-        }
-       
-    });
-
-
     var length = document.getElementById("length").value
+    var props = getChosenProperties()
+    var underlying = getPatterns(patterns);
 
-    var data = JSON.stringify({ length: parseInt(length), classic_avoidance: avoiding, classic_containment: containing })
+    var data = JSON.stringify($.extend({ length: parseInt(length) }, props, underlying));
 
     fetch("solve", {
         method: 'POST', headers: {
@@ -261,8 +243,6 @@ $(document).on('click', '#solvebtn', function () {
             getResult(json.jobid);
         })
 
-        
-    
 });
 
 function getResult(id) {
@@ -273,14 +253,14 @@ function getResult(id) {
 function setPropertyChoices() {
     var properties = JSON.parse(`${environment.properties}`)
     $.each(properties, function (i, item) {
-        
+
         var input = document.createElement("input")
         input.classList.add("form-check-input")
         input.setAttribute("type", "checkbox")
         input.setAttribute("name", "property")
         input.setAttribute("id", i)
         input.setAttribute("value", i)
-        
+
         var label = document.createElement("label")
         label.classList.add("form-check-label")
         label.appendChild(input)
@@ -297,19 +277,107 @@ function setPropertyChoices() {
 
 
 $(document).on('change', ':checkbox', function () {
-    if($(this).attr("id") === "all-property") {
+    if ($(this).attr("id") === "all-property") {
         var check = false;
-        if($("#all-property").is(':checked')) {
-           check = true;
+        if ($("#all-property").is(':checked')) {
+            check = true;
         }
-        $('input:checkbox[id^="prop_"]').each(function(){
+        $('input:checkbox[id^="prop_"]').each(function () {
             $(this).prop('checked', check);
         });
     }
 
-    else if ($(this).not(':checked')){
+    else if ($(this).not(':checked')) {
         $("#all-property").prop('checked', false);
     }
-  
+
 }
 );
+
+function getChosenProperties() {
+    var properties = JSON.parse(`${environment.properties}`)
+    var checked = false;
+
+    if ($("#all-property").is(':checked')) {
+        checked = true;
+    }
+
+    $.each(properties, function (i, item) {
+        properties[i] = checked;
+    });
+
+    $('input:checkbox[id^="prop_"]:checked').each(function () {
+        properties[$(this).attr("id")] = true;
+    });
+
+    return properties;
+}
+
+function getPatterns(patterns) {
+    var pattern_types = JSON.parse(`${environment.pattern_types}`)
+    var representation = JSON.parse(`${environment.representation}`)
+    var names = JSON.parse(`${environment.pattern_names}`)
+
+
+    patterns.forEach((element, index) => {
+        var containment = "containment";
+        if (element.containment === "a") {
+            containment = "avoidance";
+        }
+
+        var perm = element.permutation.split(",");
+        perm.forEach((e, i) => {
+            perm[i] = parseInt(e);
+        })
+        patterns[index].permutation = perm
+
+        var representation_name = representation[element.patterntype]
+        var grid_pattern = getGridPattern(representation_name, element)
+
+        var pattern = perm
+        if(grid_pattern) {
+            pattern = [perm, grid_pattern]
+        }
+
+        pattern_types[names[representation_name] + containment].push(pattern);
+
+    });
+
+    return pattern_types
+}
+
+function getGridPattern(name, pattern) {
+    switch (name) {
+        case "Vincular":
+            return getColumns(pattern.pattern)
+        case "Bivincular":
+            return getColumns(pattern.pattern)
+        case "Mesh":
+            return getCells(pattern.pattern)
+
+    }
+}
+
+
+function getColumns(grid) {
+    var columns = []
+    for (var col = 0; col < grid[0].length; col++) {
+        if (grid[0][col] == 1) {
+            columns.push(col)
+        }
+    }
+
+    return columns;
+}
+
+function getCells(grid) {
+    var cells = []
+    for(var col = 0; col < grid.length; col ++) {
+        for (var row = 0; row < grid[col].length; row++) {
+            if (grid[col][row] == 1) {
+                cells.push([row, grid.length - 1 - col])
+            }
+        }
+    }
+    return cells;
+}
