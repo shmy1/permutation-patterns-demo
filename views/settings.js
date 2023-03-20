@@ -25,6 +25,15 @@ var pattern_names = JSON.stringify({
   "Boxed Mesh": "boxed_mesh_",
   "Consecutive Patterns": "consecutive_",
 })
+
+var statistic = JSON.stringify({
+  "stat_ascentCount": "Ascent Count",
+  "stat_descentCount": "Descent Count",
+  "stat_excedanceCount": "Excedance Count",
+  "stat_inversionCount": "Inversion Count",
+  "stat_majorIndex": "Major Index",
+})
+
 var patterns = JSON.stringify({
   "classic_avoidance": [],
   "classic_containment": [],
@@ -40,11 +49,13 @@ var patterns = JSON.stringify({
   "consecutive_avoidance": [],
 })
 
+
+
 var environment = {
   "representation": representation,
   "properties": property,
   "max_patterns": 5,
   "pattern_types": patterns,
   "pattern_names":pattern_names,
-
+  "statistics" : statistic,
 }

@@ -7,6 +7,7 @@ function setup() {
     setPatternChoices();
     setPatternType();
     setPropertyChoices();
+    setStatisticChoices();
     sessionStorage.clear();
 }
 
@@ -107,6 +108,7 @@ $(document).on('change', '#permrepresentation', function () {
     var currenturl = new URL(window.location);
     currenturl.searchParams.set('representation', $('#permrepresentation').find("option:selected").attr('value'));
     window.history.pushState({}, '', currenturl);
+
     dispatchEvent(new PopStateEvent('popstate', {}));
 }
 );
@@ -227,7 +229,8 @@ $(document).on('click', '#solvebtn', function () {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
     var length = document.getElementById("length").value
-    var props = getChosenProperties()
+    var props = getCheckedBoxes(JSON.parse(`${environment.properties}`), null, "property");
+    var statistics = getCheckedBoxes(JSON.parse(`${environment.statistics}`), "#all-statistic", "statistic");
     var underlying = getPatterns(patterns);
 
     var data = JSON.stringify($.extend({ length: parseInt(length) }, props, underlying));
@@ -240,13 +243,23 @@ $(document).on('click', '#solvebtn', function () {
         })
     }).then(response => response.json())
         .then(json => {
-            getResult(json.jobid);
+            getResult(json.jobid, statistics);
         })
 
 });
 
-function getResult(id) {
-    window.location.assign("/result?id=" + id);
+function getResult(id, statistics) {
+    var stats = []
+    for(var stat in statistics) {
+        if(statistics[stat]) {
+            stats.push(stat.split("_")[1])
+        }
+    }
+    var url = "/result?id=" + id
+    if(stats.length > 0) {
+        url += "&stats=" + stats
+    }
+  window.location.assign(url);
 
 }
 
@@ -275,43 +288,77 @@ function setPropertyChoices() {
 
 }
 
+function setStatisticChoices() {
+    var statistics = JSON.parse(`${environment.statistics}`)
+    $.each(statistics, function (i, item) {
+
+        var input = document.createElement("input")
+        input.classList.add("form-check-input")
+        input.setAttribute("type", "checkbox")
+        input.setAttribute("name", "property")
+        input.setAttribute("id", i)
+        input.setAttribute("value", i)
+
+        var label = document.createElement("label")
+        label.classList.add("form-check-label")
+        label.appendChild(input)
+        label.appendChild(document.createTextNode(item))
+
+        var div = document.createElement("div")
+        div.classList.add("form-check-inline")
+        div.appendChild(label)
+        $('#statistic_choices').append(div);
+
+    });
+
+}
 
 $(document).on('change', ':checkbox', function () {
-    if ($(this).attr("id") === "all-property") {
+    if ($(this).attr("id") === "all-statistic") {
         var check = false;
-        if ($("#all-property").is(':checked')) {
+        if ($("#all-statistic").is(':checked')) {
             check = true;
         }
-        $('input:checkbox[id^="prop_"]').each(function () {
+        $('input:checkbox[id^="stat_"]').each(function () {
             $(this).prop('checked', check);
         });
     }
 
     else if ($(this).not(':checked')) {
-        $("#all-property").prop('checked', false);
+        var id = $(this).attr("id")
+        if (id.includes("stat")) {
+            $("#all-statistic").prop('checked', false);
+        }
+        
     }
 
 }
 );
 
-function getChosenProperties() {
-    var properties = JSON.parse(`${environment.properties}`)
+function getCheckedBoxes(list, all, id) {
     var checked = false;
+    if(all) {
+        if ($(all).is(':checked')) {
+            checked = true;
+        }
+    }
+    
+    $.each(list, function (i, item) {
+        list[i] = checked;
+    });
 
-    if ($("#all-property").is(':checked')) {
-        checked = true;
+    var selection = 'input:checkbox[id^="prop_"]:checked' 
+    if(id === "statistic") {
+        selection = 'input:checkbox[id^="stat_"]:checked' 
     }
 
-    $.each(properties, function (i, item) {
-        properties[i] = checked;
+    $(selection).each(function () {
+        list[$(this).attr("id")] = true;
     });
 
-    $('input:checkbox[id^="prop_"]:checked').each(function () {
-        properties[$(this).attr("id")] = true;
-    });
-
-    return properties;
+    return list;
 }
+
 
 function getPatterns(patterns) {
     var pattern_types = JSON.parse(`${environment.pattern_types}`)

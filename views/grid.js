@@ -88,20 +88,13 @@ function loadGrid(pattern) {
         grid.selectAll(".square").each(function(d) {
             if(pattern[d.row][d.column] == 1) {
                 d.click++;
-                d3.select(this).data(d)
                 d3.select(this).style("fill", "#AEAEAE")
-
-                grid.select(".column_" + d.column)
-                    .filter(".row_"+ d.row)
-                    .data(d)
-                    .style("fill", "#AEAEAE")
-
             }
         })
     }
     var representation = urlParams.get('representation');
 
-if (representation == 2 || representation == 3 || representation == 6) {
+if (representation == 2 || representation == 3) {
     column.on('click', function (d) {
         d.click++;
         if ((d.click) % 2 == 0) {
@@ -119,8 +112,7 @@ if (representation == 2 || representation == 3 || representation == 6) {
     });
 }
 
-
-else if (representation != 1 && representation ) {
+else if (representation == 4) {
     column.on('click', function (d) {
         d.click++;
         if ((d.click) % 2 == 0) {
@@ -132,6 +124,23 @@ else if (representation != 1 && representation ) {
     });
 
 }
+
+else if(representation == 5) {
+    grid.selectAll(".square").each(function(d) {
+        if((!(d.row == 0 || d.row == permutation.length)) && !(d.column == 0 || d.column == permutation.length)) {
+            d3.select(this).style("fill", "#AEAEAE")
+        }
+    })
+}
+
+else if(representation == 6) {
+    grid.selectAll(".square").each(function(d) {
+        if(!(d.column == 0 || d.column == permutation.length)) {
+            d3.select(this).style("fill", "#AEAEAE")
+        }
+    })
+}
+
 
 }
 
@@ -153,7 +162,13 @@ function getPermutation() {
 }
 
 $(document).on('click', '#clearpattern', function () {
-    clearSquares();
+    var url = new URL(document.location);
+    var urlParams = url.searchParams;
+
+    if(urlParams.get("representation") == 2 || urlParams.get("representation") == 3 || urlParams.get("representation") == 4) {
+        clearSquares();
+    }
+    
 });
 
 function clearSquares() {
@@ -225,10 +240,6 @@ $(document).on('click', '.pattern-input', function (e) {
         urlParams.delete("containment")
         $(this).parent().removeClass("selected-pattern")
         $(this).prop("checked" ,false)
-        // checkbox.removeAttr("checked")
-        // $(this).prop('checked', false)
-        // $(this).parent().removeClass('active');
-        
        
         window.history.pushState({}, '', url);
 
