@@ -33,6 +33,7 @@ function setPermutationElements() {
 }
 
 function addNewPattern(id, pattern) {
+    console.log("here")
     const label = document.createElement("label");
     label.classList.add("btn");
     label.classList.add("mr-4");
@@ -172,17 +173,19 @@ $(document).on('click', '#addpatternbtn', function () {
 
     var pattern = JSON.stringify({ permutation: permutation, patterntype: patterntype, containment: containment, pattern: array })
 
-    if ($(this).val() === "add") {
+    if ($(this).text().trim() === "Add Underlying Pattern") {
         var patternnumber = sessionStorage.length
         if (patternnumber >= `${environment.max_patterns}`) {
             console.log($('#maxPatterns'))
             $('#maxPatterns').modal('show');
         }
         else {
+            
             sessionStorage.setItem(
                 patternnumber,
                 pattern
             );
+            console.log(sessionStorage);
             addNewPattern(patternnumber, pattern);
         }
 
@@ -200,7 +203,6 @@ $(document).on('click', '#addpatternbtn', function () {
         $($("#pattern-" + patternnumber)).removeClass("selected-pattern")
         $("#input-" + patternnumber).prop("checked", false)
     }
-
 
     resetParams(url, urlParams);
 
