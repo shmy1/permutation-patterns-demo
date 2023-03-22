@@ -21,41 +21,102 @@
 </head>
 
 <body>
-  {{>addpattern}}
+  <div id="patterncontainer" class="container d-flex flex-row align-items-center mb-2 ">
 
-   <div class="d-flex flex-column container mt-2">
-    <div class = "d-flex flex-row"> 
-      <h4 class="mt-2 mr-2"> Added Pattern(s): </h4>
-      <div id = "added-patterns-container"  class = "btn-group btn-group-toggle justify-content-between overflow-auto">
-         
+    <div class="d-flex w-50 left-column ">
+      <div class="d-flex p-3 w-100 align-items-center h-75">
+        <svg class="w-100 align-self-center" id="grid"></svg>
+
+      </div>
+      <div class="d-flex align-items-end">
+        <button type="button" class="btn btn-danger" id="clearpattern">Clear Pattern</button>
+      </div>
+    </div>
+
+
+    <div class="d-flex w-50 flex-column">
+      <h3 class="align-self-center"> Underlying Pattern</h3>
+      <div class="form-group justify-content-between row ">
+
+        <label for="permutation" class="col-sm-auto align-self-center col-form-label pr-0">Permutation:</label>
+        <div class="col-form-label col-sm-auto w-50 pl-0">
+          <input required class="form-control" id="permutation" name="permutation">
+          <div class="invalid-feedback">
+            Permutation is invalid
           </div>
-      </div>
-      
-  </div>
- <div class="modal fade" name ="maxPatterns"  id="maxPatterns" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3> Warning</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" id = "modalBody">
-        <p> You have reached the maximum number of patterns that can be added.</p>
+        </div>
+        <div class="col-sm-auto align-self-center pl-0"><input type="submit" class="btn btn-success"
+            id="permutationbutton" value="Resubmit"> </input>
+        </div>
 
       </div>
+      <div class="form-group justify-content-between row ">
+        <label for="representation" class="col-sm-auto align-self-center col-form-label pr-0"> Pattern Type:
+
+        </label>
+        <div class="col-form-label col-sm-auto w-75 pl-0">
+          <select class="form-control pt-0" name="representation" id="permrepresentation">
+          </select>
+        </div>
+      </div>
+      <div id="include" class="form-group justify-content-between row">
+        <label for="include" class="col-sm-auto align-self-center col-form-label pr-0"></label>
+        <div class="align-self-center w-75">
+          <div class="form-check-inline">
+            <label class="form-check-label"><input checked class="form-check-input" type="radio" name="containment"
+                id="containment" value="true">Containment</label>
+
+          </div>
+          <div class="form-check-inline">
+            <label class="form-check-label"><input class="form-check-input" type="radio" name="containment"
+                id="avoidance" value="false">Avoidance</label>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex">
+        <button class="btn btn-danger w-50 align-self-start mb-2 mr-2" name="deletepatternbtn" id="deletepatternbtn">
+          Delete Pattern</button>
+        <button class="btn btn-success w-50 align-self-end mb-2" name="addpatternbtn" id="addpatternbtn"> Add Underlying
+          Pattern</button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="d-flex flex-column container mt-2">
+    <div class="d-flex flex-row">
+      <h4 class="mt-2 mr-2"> Added Pattern(s): </h4>
+      <div id="added-patterns-container" class="btn-group btn-group-toggle justify-content-between overflow-auto">
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal fade" name="maxPatterns" id="maxPatterns" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3> Warning</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <p> You have reached the maximum number of patterns that can be added.</p>
+
+        </div>
       </div>
     </div>
   </div>
-</div>
-</div>
+  </div>
+  </div>
   <div class="d-flex flex-column container w-50">
     <h3 class="align-self-center mt-2"> Search Space</h3>
 
     <div id="property" class="form-group justify-content-between row mt-2">
       <label for="property" class="col-sm-auto align-self-center col-form-label pr-0">Properties:</label>
-      <div class="col align-self-center w-75" id = "property_choices">
+      <div class="col align-self-center w-75" id="property_choices">
       </div>
     </div>
 
@@ -63,17 +124,17 @@
       <label for="length" class="col-sm-auto align-self-center col-form-label pr-0">Length:</label>
       <div class="col-form-label col-sm-auto w-75 ">
         <input required class="form-control" id="length" name="length" type="number">
-         <div class="invalid-feedback">
-                Invalid length.
-            </div>
+        <div class="invalid-feedback">
+          Invalid length.
+        </div>
       </div>
     </div>
     <div id="statistic" class="form-group justify-content-between row">
       <label for="statistic" class="col-sm-auto align-self-center col-form-label pr-0">Statistics:</label>
-      <div class="col align-self-center w-75" id = "statistic_choices">
+      <div class="col align-self-center w-75" id="statistic_choices">
         <div class="form-check-inline">
-          <label class="form-check-label"><input id = "all-statistic" class="form-check-input" type="checkbox" name="statistic" id="all"
-              value="all">All</label>
+          <label class="form-check-label"><input id="all-statistic" class="form-check-input" type="checkbox"
+              name="statistic" id="all" value="all">All</label>
         </div>
       </div>
 
@@ -98,6 +159,7 @@
   <script src="settings.js" type="text/javascript"></script>
   <script src="permutationvalidation.js" type="text/javascript"> </script>
   <script src="index.js" type="text/javascript"></script>
+  <script src="grid.js" type="text/javascript"></script>
 
 </body>
 
