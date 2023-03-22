@@ -23,8 +23,18 @@
 <body>
   <div class="d-flex flex-column container w-50">
     <h3 class="align-self-center mt-2"> Results</h3>
-    <h5 class="align-self-start mt-2"> Solutions:</h5>
-    <div id="solutioncontainer">
+    
+    <div class="d-flex row justify-content-between mt-2">
+      <h3 class=""> Solutions:</h5>
+        <div>
+          <button id = "edit-btn" class="btn btn-primary mr-1"> Edit Parameters</button>
+          <button id = "new-btn" onclick = "window.location = '/'" class="btn btn-success"> New Problem</button>
+        </div>
+    </div>
+    <div class="d-flex row">
+      <h5 id = "total"> Total number of solutions:</h5>
+    </div>
+    <div class = "mt-2" id="solutioncontainer">
 
     </div>
     <pre id="result-container">

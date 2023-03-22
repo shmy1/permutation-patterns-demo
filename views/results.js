@@ -2,6 +2,9 @@ var url = new URL(document.location);
 var urlParams = url.searchParams;
 var id = urlParams.get("id")
 
+$('#new-btn').css("visibility", "hidden");
+$('#edit-btn').css("visibility", "hidden");
+
 getResult();
 
 function getResult() {
@@ -29,8 +32,14 @@ function getResult() {
                     else {
                         document.getElementById("result-container").textContent = JSON.stringify(json, undefined, 2);
                     }
+                    if (localStorage.getItem(id)) {
+                        $('#edit-btn').css("visibility", "visible");
+                    }
+                    $('#new-btn').css("visibility", "visible");
 
                 }
+
+                
 
             })
     }
@@ -49,17 +58,21 @@ function showResults(results) {
     $.each(results.solution, function (i, item) {
         showSolution(item, stats)
     });
+    $('#total').append(document.createTextNode(" " + results.solution.length));
+
 }
 
 function showSolution(solution, stats) {
     var statistics = JSON.parse(`${environment.statistics}`)
 
-    var label = document.createElement("label")
-    label.appendChild(document.createTextNode("Permutation: " + solution.perm))
+    var li = document.createElement("li")
+    var permutation = solution.perm
+    permutation = permutation.length < 10 ? permutation.join('') : permutation.join(' ')
+    li.appendChild(document.createTextNode("Permutation: " + permutation))
 
     var div = document.createElement("div")
     div.classList.add("mb-3")
-    div.appendChild(label)
+    div.appendChild(li)
 
     if (stats) {
         for (var i = 0; i < stats.length; i++) {
@@ -73,3 +86,9 @@ function showSolution(solution, stats) {
     $('#solutioncontainer').append(div);
 
 }
+
+$(document).on('click', '#edit-btn', function () {
+    if (localStorage.getItem(id)) {
+        window.location.assign(localStorage.getItem(id))
+    }
+});

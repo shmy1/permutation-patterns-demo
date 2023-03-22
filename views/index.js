@@ -9,6 +9,7 @@ function setup() {
     setPropertyChoices();
     setStatisticChoices();
     sessionStorage.clear();
+    UrlToPattern();
 }
 
 function setPermutationElements() {
@@ -33,7 +34,6 @@ function setPermutationElements() {
 }
 
 function addNewPattern(id, pattern) {
-    console.log("here")
     const label = document.createElement("label");
     label.classList.add("btn");
     label.classList.add("mr-4");
@@ -79,7 +79,7 @@ function setPatternChoices() {
 
     var currenturl = new URL(window.location);
     if (window.location.pathname === "/") {
-        currenturl.searchParams.set('representation', 1);
+        currenturl.searchParams.set('type', 1);
         window.history.pushState({}, '', currenturl);
     }
 
@@ -89,17 +89,20 @@ function setPatternType() {
     var url = new URL(document.location);
     var params = url.searchParams;
 
-    if (params.get('representation')) {
-        var representation = params.get('representation')
+    if (params.get('type')) {
+        var representation = params.get('type')
         $('#permrepresentation').val(representation);
     }
 }
 
-function resetParams(url, urlParams) {
+function resetParams() {
+    var url = new URL(document.location);
+    var urlParams = url.searchParams;
+
     urlParams.delete("id")
     urlParams.delete("permutation")
-    urlParams.delete("containment")
-    urlParams.set('representation', 1);
+    urlParams.delete("contain")
+    urlParams.set('type', 1);
     window.history.pushState({}, '', url);
     dispatchEvent(new PopStateEvent('popstate', {}));
 }
@@ -107,7 +110,7 @@ function resetParams(url, urlParams) {
 
 $(document).on('change', '#permrepresentation', function () {
     var currenturl = new URL(window.location);
-    currenturl.searchParams.set('representation', $('#permrepresentation').find("option:selected").attr('value'));
+    currenturl.searchParams.set('type', $('#permrepresentation').find("option:selected").attr('value'));
     window.history.pushState({}, '', currenturl);
 
     dispatchEvent(new PopStateEvent('popstate', {}));
@@ -116,7 +119,7 @@ $(document).on('change', '#permrepresentation', function () {
 
 $(document).on('change', '#include', function () {
     var currenturl = new URL(window.location);
-    currenturl.searchParams.set("containment", $('#include input:checked').attr("value"));
+    currenturl.searchParams.set("contain", $('#include input:checked').attr("value"));
     window.history.pushState({}, '', currenturl);
     dispatchEvent(new PopStateEvent('popstate', {}));
 }
@@ -150,7 +153,7 @@ $(document).on('click', '#addpatternbtn', function () {
     var urlParams = url.searchParams;
 
     var permutation = urlParams.get('permutation');
-    var patterntype = urlParams.get('representation')
+    var patterntype = urlParams.get('type')
     var containment = $('input:radio[name="containment"]:checked').val();
 
     var permutationlength = permutation.split(",").length
@@ -176,16 +179,15 @@ $(document).on('click', '#addpatternbtn', function () {
     if ($(this).text().trim() === "Add Underlying Pattern") {
         var patternnumber = sessionStorage.length
         if (patternnumber >= `${environment.max_patterns}`) {
-            console.log($('#maxPatterns'))
             $('#maxPatterns').modal('show');
         }
         else {
-            
+
             sessionStorage.setItem(
                 patternnumber,
                 pattern
             );
-            console.log(sessionStorage);
+            console.log(pattern)
             addNewPattern(patternnumber, pattern);
         }
 
@@ -204,6 +206,7 @@ $(document).on('click', '#addpatternbtn', function () {
         $("#input-" + patternnumber).prop("checked", false)
     }
 
+    patternToUrl(JSON.parse(pattern))
     resetParams(url, urlParams);
 
 });
@@ -218,7 +221,7 @@ $(document).on('click', '#deletepatternbtn', function () {
 
     $("#pattern-" + id).remove();
 
-    resetParams(url, urlParams)
+    resetParams()
 
 });
 
@@ -231,37 +234,48 @@ $(document).on('click', '#solvebtn', function () {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
     var length = document.getElementById("length").value
-    var props = getCheckedBoxes(JSON.parse(`${environment.properties}`), null, "property");
-    var statistics = getCheckedBoxes(JSON.parse(`${environment.statistics}`), "#all-statistic", "statistic");
-    var underlying = getPatterns(patterns);
 
-    var data = JSON.stringify($.extend({ length: parseInt(length) }, props, underlying));
+    
+    if (!isValidLength(patterns, length)) { 
+        
+        document.getElementById("length").classList.add('is-invalid')
+    }
 
-    fetch("solve", {
-        method: 'POST', headers: {
-            'Content-Type': 'application/json'
-        }, body: JSON.stringify({
-            data: data,
-        })
-    }).then(response => response.json())
-        .then(json => {
-            getResult(json.jobid, statistics);
-        })
+    else {
+        var props = getCheckedBoxes(JSON.parse(`${environment.properties}`), null, "property");
+        var statistics = getCheckedBoxes(JSON.parse(`${environment.statistics}`), "#all-statistic", "statistic");
+        var underlying = getPatterns(patterns);
 
+        var data = JSON.stringify($.extend({ length: parseInt(length) }, props, underlying));
+
+        fetch("solve", {
+            method: 'POST', headers: {
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                data: data,
+            })
+        }).then(response => response.json())
+            .then(json => {
+                sessionStorage.clear();
+                localStorage.setItem(json.jobid, new URL(document.location));
+                getResult(json.jobid, statistics);
+                
+            })
+    }
 });
 
 function getResult(id, statistics) {
     var stats = []
-    for(var stat in statistics) {
-        if(statistics[stat]) {
+    for (var stat in statistics) {
+        if (statistics[stat]) {
             stats.push(stat.split("_")[1])
         }
     }
     var url = "/result?id=" + id
-    if(stats.length > 0) {
+    if (stats.length > 0) {
         url += "&stats=" + stats
     }
-  window.location.assign(url);
+    window.location.assign(url);
 
 }
 
@@ -331,7 +345,7 @@ $(document).on('change', ':checkbox', function () {
         if (id.includes("stat")) {
             $("#all-statistic").prop('checked', false);
         }
-        
+
     }
 
 }
@@ -339,19 +353,19 @@ $(document).on('change', ':checkbox', function () {
 
 function getCheckedBoxes(list, all, id) {
     var checked = false;
-    if(all) {
+    if (all) {
         if ($(all).is(':checked')) {
             checked = true;
         }
     }
-    
+
     $.each(list, function (i, item) {
         list[i] = checked;
     });
 
-    var selection = 'input:checkbox[id^="prop_"]:checked' 
-    if(id === "statistic") {
-        selection = 'input:checkbox[id^="stat_"]:checked' 
+    var selection = 'input:checkbox[id^="prop_"]:checked'
+    if (id === "statistic") {
+        selection = 'input:checkbox[id^="stat_"]:checked'
     }
 
     $(selection).each(function () {
@@ -370,7 +384,7 @@ function getPatterns(patterns) {
 
     patterns.forEach((element, index) => {
         var containment = "containment";
-        if (element.containment === "a") {
+        if (element.containment === "false") {
             containment = "avoidance";
         }
 
@@ -384,7 +398,7 @@ function getPatterns(patterns) {
         var grid_pattern = getGridPattern(representation_name, element)
 
         var pattern = perm
-        if(grid_pattern) {
+        if (grid_pattern) {
             pattern = [perm, grid_pattern]
         }
 
@@ -421,7 +435,7 @@ function getColumns(grid) {
 
 function getCells(grid) {
     var cells = []
-    for(var col = 0; col < grid.length; col ++) {
+    for (var col = 0; col < grid.length; col++) {
         for (var row = 0; row < grid[col].length; row++) {
             if (grid[col][row] == 1) {
                 cells.push([row, grid.length - 1 - col])
@@ -429,4 +443,50 @@ function getCells(grid) {
         }
     }
     return cells;
+}
+
+function patternToUrl(pattern) {
+    var currenturl = new URL(window.location);
+    var array = ["-", pattern.permutation, pattern.patterntype, pattern.containment]
+
+    if (currenturl.searchParams.get("patterns")) {
+        array = currenturl.searchParams.get("patterns").concat(array)
+    }
+
+    currenturl.searchParams.set('patterns', array);
+    window.history.pushState({}, '', currenturl);
+
+}
+
+function UrlToPattern() {
+    var currenturl = new URL(window.location);
+    var patterns = currenturl.searchParams.get("patterns");
+
+
+    if (patterns) {
+        patterns = patterns.split("-").filter(item => item.trim().length > 0)
+        $.each(patterns, function (i, item) {
+            var temp = item.split(",").filter(item => item.trim().length > 0)
+            var pattern = JSON.stringify({ permutation: temp.slice(0, -2).toString(), patterntype: temp.slice(-2, -1).toString(), containment: temp.slice(-1).toString() })
+            console.log(pattern)
+            sessionStorage.setItem(
+                i,
+                pattern
+            );
+            addNewPattern(i, pattern);
+        });
+    }
+
+}
+
+function isValidLength(patterns, length) {
+    var arr = [];
+    $.each(patterns, function (i, item) {
+        arr[i] = item.permutation
+    });
+
+    var min = (arr.reduce((a, b) => a.length <= b.length ? a : b)).split(",").length
+    return min < length
+    
+
 }

@@ -92,7 +92,7 @@ function loadGrid(pattern) {
             }
         })
     }
-    var representation = urlParams.get('representation');
+    var representation = urlParams.get('type');
 
 if (representation == 2 || representation == 3) {
     column.on('click', function (d) {
@@ -165,7 +165,7 @@ $(document).on('click', '#clearpattern', function () {
     var url = new URL(document.location);
     var urlParams = url.searchParams;
 
-    if(urlParams.get("representation") == 2 || urlParams.get("representation") == 3 || urlParams.get("representation") == 4) {
+    if(urlParams.get("type") == 2 || urlParams.get("type") == 3 || urlParams.get("type") == 4) {
         clearSquares();
     }
     
@@ -215,8 +215,8 @@ $(document).on('click', '.pattern-input', function (e) {
     if($(this).is(":checked")) {
         urlParams.set('id', patternid);
         urlParams.set('permutation', pattern.permutation)
-        urlParams.set('representation', pattern.patterntype)
-        urlParams.set('containment', pattern.containment)
+        urlParams.set('type', pattern.patterntype)
+        urlParams.set('contain', pattern.containment)
     
         window.history.pushState({}, '', url);
 
@@ -237,7 +237,7 @@ $(document).on('click', '.pattern-input', function (e) {
     else {
         urlParams.delete("permutation")
         urlParams.delete("id")
-        urlParams.delete("containment")
+        urlParams.delete("contain")
         $(this).parent().removeClass("selected-pattern")
         $(this).prop("checked" ,false)
        
