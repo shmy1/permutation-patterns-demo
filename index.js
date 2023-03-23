@@ -10,8 +10,9 @@ function setup() {
     setPropertyChoices();
     setStatisticChoices();
     sessionStorage.clear();
-    UrlToPattern();
     sessionStorage.setItem("total", 0)
+    UrlToPattern();
+    
 }
 
 function setPermutationElements() {
@@ -187,6 +188,7 @@ $(document).on('click', '#addpatternbtn', function () {
         }
         array[i] = temp
     }
+
     var grid = d3.select("#grid")
     grid.selectAll(".square").each(function (d) {
         if (d3.select(this).style("fill") != "rgb(255, 255, 255)") {
@@ -495,6 +497,7 @@ function UrlToPattern() {
     var currenturl = new URL(window.location);
     var patterns = currenturl.searchParams.get("patterns");
 
+    var count = 0;
 
     if (patterns) {
         patterns = patterns.split("-").filter(item => item.trim().length > 0)
@@ -505,12 +508,12 @@ function UrlToPattern() {
                 i,
                 pattern
             )
-            var count = sessionStorage.getItem("total");
-            count = parseInt(count) + 1;
-            sessionStorage.setItem("total", count)
+            count++;
+            
             addNewPattern(i, pattern);
         });
     }
+    sessionStorage.setItem("total", count)
 
 }
 
