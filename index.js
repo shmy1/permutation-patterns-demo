@@ -6,6 +6,7 @@ function setup() {
     setPermutationElements();
     setPatternChoices();
     setPatternType();
+    setContainment();
     setPropertyChoices();
     setStatisticChoices();
     sessionStorage.clear();
@@ -96,6 +97,23 @@ function setPatternType() {
     }
 }
 
+function setContainment() {
+    var url = new URL(document.location);
+    var params = url.searchParams;
+    if (params.get('contain')) {
+        var containment = params.get('contain')
+        var selection = $('input:radio[name="containment"]')
+        $.each(selection, function (i, item) {
+            if($(this).val() != containment) {
+                $(this).prop("checked", false)
+            }
+            else{
+                $(this).prop("checked", true)
+            }
+        });
+    }
+}
+
 function resetParams() {
     var url = new URL(document.location);
     var urlParams = url.searchParams;
@@ -129,6 +147,7 @@ $(document).on('change', '#include', function () {
 window.addEventListener('popstate', function (event) {
     setPermutationElements();
     setPatternType();
+    setContainment();
     var url = new URL(document.location);
     var urlParams = url.searchParams;
 
@@ -193,9 +212,6 @@ $(document).on('click', '#addpatternbtn', function () {
 
             addNewPattern(patternnumber, pattern);
         }
-
-
-
     }
 
     else {
@@ -230,7 +246,7 @@ $(document).on('click', '#deletepatternbtn', function () {
 
 
 $(document).on('click', '#solvebtn', function () {
-    var numberPatterns = sessionStorage.getItem("total") + 1;
+    var numberPatterns = sessionStorage.getItem("total");
     let patterns = []
     for (let i = 0; i < numberPatterns; i++) {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
@@ -277,35 +293,7 @@ $(document).on('click', '#solvebtn', function () {
                             });
                     })
             });
-
-
-
-        // fetch("solve", {
-        //     method: 'POST', headers: {
-        //         'Content-Type': 'application/json'
-        //     }, body: JSON.stringify({
-        //         data: data,
-        //     })
-        // }).then(response => response.json())
-        //     .then(json => {
-
-
-        //     })
     }
-
-
-    // console.log(data.data);
-    // const url = 'https://demos.constraintmodelling.org/server/submit'
-
-    // axios
-    //     .post(url, data, {
-    //         headers: {
-    //             Accept: "application/json",
-    //             "Content-Type": "application/json;charset=UTF-8",
-    //         },
-    //     })
-
-
 
 });
 
@@ -516,7 +504,10 @@ function UrlToPattern() {
             sessionStorage.setItem(
                 i,
                 pattern
-            );
+            )
+            var count = sessionStorage.getItem("total");
+            count = parseInt(count) + 1;
+            sessionStorage.setItem("total", count)
             addNewPattern(i, pattern);
         });
     }
