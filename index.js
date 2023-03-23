@@ -230,13 +230,12 @@ $(document).on('click', '#deletepatternbtn', function () {
 
 
 $(document).on('click', '#solvebtn', function () {
-    var numberPatterns = sessionStorage.getItem("total");
+    var numberPatterns = sessionStorage.getItem("total") + 1;
     let patterns = []
     for (let i = 0; i < numberPatterns; i++) {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
     var length = document.getElementById("length").value
-
 
     if (!isValidLength(patterns, length)) {
         document.getElementById("length").classList.add('is-invalid')
