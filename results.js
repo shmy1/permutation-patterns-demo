@@ -11,12 +11,10 @@ function getResult() {
     var solverDone = false;
 
     if (!solverDone) {
-        fetch("getJob", {
+        fetch("https://demos.constraintmodelling.org/server/get", {
             method: 'POST', headers: {
                 'Content-Type': 'application/json'
-            }, body: JSON.stringify({
-                data: id,
-            })
+            },  body: JSON.stringify({ jobid: id })
         }).then(response => response.json())
             .then(json => {
                 if (json.status == "wait") {

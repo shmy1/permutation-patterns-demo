@@ -10,6 +10,7 @@ function setup() {
     setStatisticChoices();
     sessionStorage.clear();
     UrlToPattern();
+    sessionStorage.setItem("total", 0)
 }
 
 function setPermutationElements() {
@@ -78,7 +79,7 @@ function setPatternChoices() {
     });
 
     var currenturl = new URL(window.location);
-    if (window.location.pathname === "/") {
+    if (window.location.pathname === "/index.html") {
         currenturl.searchParams.set('type', 1);
         window.history.pushState({}, '', currenturl);
     }
@@ -177,17 +178,19 @@ $(document).on('click', '#addpatternbtn', function () {
     var pattern = JSON.stringify({ permutation: permutation, patterntype: patterntype, containment: containment, pattern: array })
 
     if ($(this).text().trim() === "Add Underlying Pattern") {
-        var patternnumber = sessionStorage.length
+        var patternnumber = sessionStorage.getItem("total")
         if (patternnumber >= `${environment.max_patterns}`) {
             $('#maxPatterns').modal('show');
         }
         else {
-
             sessionStorage.setItem(
                 patternnumber,
                 pattern
             );
-            console.log(pattern)
+            var count = sessionStorage.getItem("total");
+            count = parseInt(count) + 1;
+            sessionStorage.setItem("total", count)
+
             addNewPattern(patternnumber, pattern);
         }
 
@@ -227,17 +230,15 @@ $(document).on('click', '#deletepatternbtn', function () {
 
 
 $(document).on('click', '#solvebtn', function () {
-    var numberPatterns = sessionStorage.length;
-
+    var numberPatterns = sessionStorage.getItem("total");
     let patterns = []
     for (let i = 0; i < numberPatterns; i++) {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
     var length = document.getElementById("length").value
 
-    
-    if (!isValidLength(patterns, length)) { 
-        
+
+    if (!isValidLength(patterns, length)) {
         document.getElementById("length").classList.add('is-invalid')
     }
 
@@ -246,22 +247,67 @@ $(document).on('click', '#solvebtn', function () {
         var statistics = getCheckedBoxes(JSON.parse(`${environment.statistics}`), "#all-statistic", "statistic");
         var underlying = getPatterns(patterns);
 
-        var data = JSON.stringify($.extend({ length: parseInt(length) }, props, underlying));
 
-        fetch("solve", {
-            method: 'POST', headers: {
-                'Content-Type': 'application/json'
-            }, body: JSON.stringify({
-                data: data,
-            })
-        }).then(response => response.json())
+        var inputs = $.extend({ length: parseInt(length) }, props, underlying)
+        fetch("empty.json")
+            .then(response => response.json())
             .then(json => {
-                sessionStorage.clear();
-                localStorage.setItem(json.jobid, new URL(document.location));
-                getResult(json.jobid, statistics);
-                
-            })
+                var emptyData = json
+                fetch('/combined.essence')
+                    .then(response => response.text())
+                    .then((data) => {
+                        var details = {
+                            model: data,
+                            data: JSON.stringify(Object.assign(emptyData, inputs)),
+                            solver: "minion",
+                            conjure_options: ["--number-of-solutions", "10000"]
+                        }
+                        fetch("https://demos.constraintmodelling.org/server/submit", {
+                            method: 'POST', headers: {
+                                'Content-Type': 'application/json'
+                            }, body: JSON.stringify(details)
+                        })
+                            .then(response => response.json())
+                            .then(json => {
+                                sessionStorage.clear();
+                                localStorage.setItem(json.jobid, new URL(document.location));
+                                getResult(json.jobid, statistics);
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                            });
+                    })
+            });
+
+
+
+        // fetch("solve", {
+        //     method: 'POST', headers: {
+        //         'Content-Type': 'application/json'
+        //     }, body: JSON.stringify({
+        //         data: data,
+        //     })
+        // }).then(response => response.json())
+        //     .then(json => {
+
+
+        //     })
     }
+
+
+    // console.log(data.data);
+    // const url = 'https://demos.constraintmodelling.org/server/submit'
+
+    // axios
+    //     .post(url, data, {
+    //         headers: {
+    //             Accept: "application/json",
+    //             "Content-Type": "application/json;charset=UTF-8",
+    //         },
+    //     })
+
+
+
 });
 
 function getResult(id, statistics) {
@@ -271,7 +317,7 @@ function getResult(id, statistics) {
             stats.push(stat.split("_")[1])
         }
     }
-    var url = "/result?id=" + id
+    var url = "/result.html?id=" + id
     if (stats.length > 0) {
         url += "&stats=" + stats
     }
@@ -468,7 +514,6 @@ function UrlToPattern() {
         $.each(patterns, function (i, item) {
             var temp = item.split(",").filter(item => item.trim().length > 0)
             var pattern = JSON.stringify({ permutation: temp.slice(0, -2).toString(), patterntype: temp.slice(-2, -1).toString(), containment: temp.slice(-1).toString() })
-            console.log(pattern)
             sessionStorage.setItem(
                 i,
                 pattern
@@ -481,12 +526,13 @@ function UrlToPattern() {
 
 function isValidLength(patterns, length) {
     var arr = [];
+
     $.each(patterns, function (i, item) {
         arr[i] = item.permutation
     });
 
     var min = (arr.reduce((a, b) => a.length <= b.length ? a : b)).split(",").length
     return min < length
-    
+
 
 }

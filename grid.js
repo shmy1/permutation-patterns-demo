@@ -211,7 +211,7 @@ $(document).on('click', '.pattern-input', function (e) {
     var patternid = $(this).parent().attr("value");
     var pattern = JSON.parse(sessionStorage.getItem(patternid));
     
-
+    
     if($(this).is(":checked")) {
         urlParams.set('id', patternid);
         urlParams.set('permutation', pattern.permutation)
