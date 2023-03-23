@@ -80,7 +80,7 @@ function setPatternChoices() {
     });
 
     var currenturl = new URL(window.location);
-    if (window.location.pathname === "/") {
+    if (!currenturl.searchParams.get("type")) {
         currenturl.searchParams.set('type', 1);
         window.history.pushState({}, '', currenturl);
     }
