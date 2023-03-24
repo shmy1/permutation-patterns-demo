@@ -90,3 +90,11 @@ $(document).on('click', '#edit-btn', function () {
         window.location.assign(localStorage.getItem(id))
     }
 });
+
+$(document).on('click', '#new-btn', function() {
+    var url = new URL(document.location);
+    url.searchParams.delete("id");
+    window.history.pushState({}, '', url);
+    window.location.href = window.location.href.replace(window.location.pathname.split('/').pop(), '')
+    
+})
