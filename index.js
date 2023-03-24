@@ -213,11 +213,13 @@ $(document).on('click', '#addpatternbtn', function () {
             sessionStorage.setItem("total", count)
 
             addNewPattern(patternnumber, pattern);
+           
         }
     }
 
     else {
         var patternnumber = urlParams.get("id")
+        deletePatternUrl(JSON.parse(sessionStorage.getItem(patternnumber)))
         sessionStorage.setItem(
             patternnumber,
             pattern
@@ -241,12 +243,21 @@ $(document).on('click', '#deletepatternbtn', function () {
     sessionStorage.removeItem(id)
     $("#pattern-" + id).remove();
 
+    deletePatternUrl(pattern)
+
+    resetParams()
+
+});
+
+function deletePatternUrl(pattern) {
+    var url = new URL(document.location);
+    var urlParams = url.searchParams;
+    
     var allpatterns = urlParams.get("patterns").split(",")
     var toRemove = ["-", pattern.patterntype, pattern.containment].concat(pattern.permutation.split(","))
     allpatterns = allpatterns.filter( x => !toRemove.includes(x) );
 
     sessionStorage.setItem("total", sessionStorage.getItem("total") - 1)
-    
     if(allpatterns.length == 0) {
         urlParams.delete("patterns")
     }
@@ -255,11 +266,7 @@ $(document).on('click', '#deletepatternbtn', function () {
     }
     
     window.history.pushState({}, '', url);
-
-    resetParams()
-
-});
-
+}
 
 $(document).on('click', '#solvebtn', function () {
     var numberPatterns = sessionStorage.getItem("total");
