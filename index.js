@@ -291,7 +291,7 @@ $(document).on('click', '#solvebtn', function () {
             .then(response => response.json())
             .then(json => {
                 var emptyData = json
-                fetch('/combined.essence')
+                fetch('combined.essence')
                     .then(response => response.text())
                     .then((data) => {
                         var details = {
@@ -329,7 +329,15 @@ function getResult(id, statistics) {
         }
     }
     
-    var url = "/result.html?id=" + id
+    var url = window.location.pathname.split("/").filter(item => item.trim().length > 0)
+    
+    if(url.length > 0 && url[0] != "index.html") {
+        url = url[0] + "/result.html?id=" + id
+    }
+    
+    else {
+        url = "/result.html?id=" + id
+    }
 
    
     if (stats.length > 0) {
