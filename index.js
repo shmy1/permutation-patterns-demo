@@ -314,17 +314,21 @@ $(document).on('click', '#solvebtn', function () {
 });
 
 function getResult(id, statistics) {
+    
     var stats = []
     for (var stat in statistics) {
         if (statistics[stat]) {
             stats.push(stat.split("_")[1])
         }
     }
+    
     var url = "/result.html?id=" + id
+
+   
     if (stats.length > 0) {
         url += "&stats=" + stats
     }
-    window.location.assign(url);
+    window.location.assign(new URL(url, window.location.href).href);
 
 }
 
