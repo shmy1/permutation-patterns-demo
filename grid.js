@@ -100,13 +100,21 @@ if (representation == 2 || representation == 3) {
         if ((d.click) % 2 == 0) {
             row.selectAll(".column_" + d.column).style("fill", "#FFFFFF");
             if (representation == 3) {
-                row.selectAll(".row_" + d.row).style("fill", "#FFFFFF");
+                grid.selectAll(".square").each(function(square) {
+                    if(!(square.row == 0 || square.row == permutation.length)) {
+                        d3.select(this).style("fill", "#FFFFFF")
+                    }
+                })
             }
         }
         if ((d.click) % 2 == 1) {
             row.selectAll(".column_" + d.column).style("fill", "#AEAEAE");
             if (representation == 3) {
-                row.selectAll(".row_" + d.row).style("fill", "#AEAEAE");
+                grid.selectAll(".square").each(function(square) {
+                    if(!(square.row == 0 || square.row == permutation.length)) {
+                        d3.select(this).style("fill", "#AEAEAE")
+                    }
+                })
             }
         }
     });

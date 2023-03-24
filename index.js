@@ -12,7 +12,7 @@ function setup() {
     sessionStorage.clear();
     sessionStorage.setItem("total", 0)
     UrlToPattern();
-    
+
 }
 
 function setPermutationElements() {
@@ -105,10 +105,10 @@ function setContainment() {
         var containment = params.get('contain')
         var selection = $('input:radio[name="containment"]')
         $.each(selection, function (i, item) {
-            if($(this).val() != containment) {
+            if ($(this).val() != containment) {
                 $(this).prop("checked", false)
             }
-            else{
+            else {
                 $(this).prop("checked", true)
             }
         });
@@ -237,10 +237,24 @@ $(document).on('click', '#deletepatternbtn', function () {
     var urlParams = url.searchParams;
 
     var id = urlParams.get("id");
-
+    var pattern = JSON.parse(sessionStorage.getItem(id));
     sessionStorage.removeItem(id)
-
     $("#pattern-" + id).remove();
+
+    var allpatterns = urlParams.get("patterns").split(",")
+    var toRemove = ["-", pattern.patterntype, pattern.containment].concat(pattern.permutation.split(","))
+    allpatterns = allpatterns.filter( x => !toRemove.includes(x) );
+
+    sessionStorage.setItem("total", sessionStorage.getItem("total") - 1)
+    
+    if(allpatterns.length == 0) {
+        urlParams.delete("patterns")
+    }
+    else {
+        urlParams.set("patterns", allpatterns)
+    }
+    
+    window.history.pushState({}, '', url);
 
     resetParams()
 
@@ -501,15 +515,26 @@ function UrlToPattern() {
 
     if (patterns) {
         patterns = patterns.split("-").filter(item => item.trim().length > 0)
+
         $.each(patterns, function (i, item) {
+            
             var temp = item.split(",").filter(item => item.trim().length > 0)
-            var pattern = JSON.stringify({ permutation: temp.slice(0, -2).toString(), patterntype: temp.slice(-2, -1).toString(), containment: temp.slice(-1).toString() })
+            var array = []
+
+            for (let i = 0; i < temp.slice(0, -2).length + 1; i++) {
+                var arr = []
+                for (let j = 0; j <  temp.slice(0, -2).length + 1; j++) {
+                    arr[j] = 0
+                }
+                array[i] = arr
+            }
+            var pattern = JSON.stringify({ permutation: temp.slice(0, -2).toString(), patterntype: temp.slice(-2, -1).toString(), containment: temp.slice(-1).toString(), pattern: array })
             sessionStorage.setItem(
                 i,
                 pattern
             )
             count++;
-            
+
             addNewPattern(i, pattern);
         });
     }
