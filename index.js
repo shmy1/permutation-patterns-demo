@@ -329,21 +329,13 @@ function getResult(id, statistics) {
         }
     }
     
-    var url = window.location.pathname.split("/").filter(item => item.trim().length > 0)
-    
-    if(url.length > 0 && url[0] != "index.html") {
-        url = url[0] + "/result.html?id=" + id
-    }
-    
-    else {
-        url = "/result.html?id=" + id
-    }
+    var url = "result.html?id=" + id
 
    
     if (stats.length > 0) {
         url += "&stats=" + stats
     }
-    window.location.assign(new URL(url, window.location.href).href);
+    window.location.assign(url);
 
 }
 
