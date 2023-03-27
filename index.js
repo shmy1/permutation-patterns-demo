@@ -146,6 +146,8 @@ $(document).on('change', '#include', function () {
 }
 );
 
+
+
 window.addEventListener('popstate', function (event) {
     setPermutationElements();
     setPatternType();
@@ -209,10 +211,6 @@ $(document).on('click', '#addpatternbtn', function () {
                 patternnumber,
                 pattern
             );
-            var count = sessionStorage.getItem("total");
-            count = parseInt(count) + 1;
-            sessionStorage.setItem("total", count)
-
             addNewPattern(patternnumber, pattern);
 
         }
@@ -229,7 +227,10 @@ $(document).on('click', '#addpatternbtn', function () {
         $($("#pattern-" + patternnumber)).removeClass("selected-pattern")
         $("#input-" + patternnumber).prop("checked", false)
     }
-
+    var count = sessionStorage.getItem("total");
+    count = parseInt(count) + 1;
+    sessionStorage.setItem("total", count)
+    
     patternToUrl(JSON.parse(pattern))
     resetParams(url, urlParams);
 
