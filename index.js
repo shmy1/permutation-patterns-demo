@@ -9,6 +9,7 @@ function setup() {
     setContainment();
     setPropertyChoices();
     setStatisticChoices();
+    setLength();
     sessionStorage.clear();
     sessionStorage.setItem("total", 0)
     UrlToPattern();
@@ -123,6 +124,7 @@ function resetParams() {
     urlParams.delete("permutation")
     urlParams.delete("contain")
     urlParams.delete("property")
+    urlParams.delete("length")
     urlParams.set('type', 1);
     window.history.pushState({}, '', url);
     dispatchEvent(new PopStateEvent('popstate', {}));
@@ -146,12 +148,22 @@ $(document).on('change', '#include', function () {
 }
 );
 
+$(document).on('change', '#length', function () {
+    var currenturl = new URL(window.location);
+    currenturl.searchParams.set("length", $(this).val());
+    window.history.pushState({}, '', currenturl);
+}
+);
 
-
+function setLength() {
+    var currenturl = new URL(window.location);
+    if(currenturl.searchParams.get("length")) {
+        $("#length").val(currenturl.searchParams.get("length"))
+    }
+}
 window.addEventListener('popstate', function (event) {
     setPermutationElements();
     setPatternType();
-    setContainment();
     var url = new URL(document.location);
     var urlParams = url.searchParams;
 
@@ -230,7 +242,7 @@ $(document).on('click', '#addpatternbtn', function () {
     var count = sessionStorage.getItem("total");
     count = parseInt(count) + 1;
     sessionStorage.setItem("total", count)
-    
+
     patternToUrl(JSON.parse(pattern))
     resetParams(url, urlParams);
 
