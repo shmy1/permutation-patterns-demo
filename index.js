@@ -122,6 +122,7 @@ function resetParams() {
     urlParams.delete("id")
     urlParams.delete("permutation")
     urlParams.delete("contain")
+    urlParams.delete("property")
     urlParams.set('type', 1);
     window.history.pushState({}, '', url);
     dispatchEvent(new PopStateEvent('popstate', {}));
@@ -213,7 +214,7 @@ $(document).on('click', '#addpatternbtn', function () {
             sessionStorage.setItem("total", count)
 
             addNewPattern(patternnumber, pattern);
-           
+
         }
     }
 
@@ -252,19 +253,19 @@ $(document).on('click', '#deletepatternbtn', function () {
 function deletePatternUrl(pattern) {
     var url = new URL(document.location);
     var urlParams = url.searchParams;
-    
+
     var allpatterns = urlParams.get("patterns").split(",")
     var toRemove = ["-", pattern.patterntype, pattern.containment].concat(pattern.permutation.split(","))
-    allpatterns = allpatterns.filter( x => !toRemove.includes(x) );
+    allpatterns = allpatterns.filter(x => !toRemove.includes(x));
 
     sessionStorage.setItem("total", sessionStorage.getItem("total") - 1)
-    if(allpatterns.length == 0) {
+    if (allpatterns.length == 0) {
         urlParams.delete("patterns")
     }
     else {
         urlParams.set("patterns", allpatterns)
     }
-    
+
     window.history.pushState({}, '', url);
 }
 
@@ -321,17 +322,17 @@ $(document).on('click', '#solvebtn', function () {
 });
 
 function getResult(id, statistics) {
-    
+
     var stats = []
     for (var stat in statistics) {
         if (statistics[stat]) {
             stats.push(stat.split("_")[1])
         }
     }
-    
+
     var url = "result.html?id=" + id
 
-   
+
     if (stats.length > 0) {
         url += "&stats=" + stats
     }
@@ -361,6 +362,16 @@ function setPropertyChoices() {
         $('#property_choices').append(div);
 
     });
+
+    var url = new URL(document.location);
+    var chosen = url.searchParams.get("property")
+
+    if(chosen) {
+        chosen = chosen.split(",").filter(item => item.trim().length > 0)
+        $.each(chosen, function (i, item) {
+            $("#" + item).prop("checked", true)
+        });
+    }
 
 }
 
@@ -408,6 +419,28 @@ $(document).on('change', ':checkbox', function () {
 
     }
 
+    var id = $(this).attr("id") + ","
+    
+    var currenturl = new URL(window.location);
+    if(id.includes("prop")) {
+        if(!$(this).prop( "checked" )) {
+            id = currenturl.searchParams.get("property").split(",").filter(item => item.trim().length > 0)
+            id = id.filter(item => item !== $(this).attr("id"))
+        }
+        else {
+            if(currenturl.searchParams.get("property")) {
+                id = currenturl.searchParams.get("property").split(",").filter(item => item.trim().length > 0).concat(id)
+            }
+        }
+
+        if(id.length == 0) {
+            currenturl.searchParams.delete('property');
+        }
+        else {
+            currenturl.searchParams.set('property', id);
+        }
+        window.history.pushState({}, '', currenturl);
+    }
 }
 );
 
@@ -528,13 +561,13 @@ function UrlToPattern() {
         patterns = patterns.split("-").filter(item => item.trim().length > 0)
 
         $.each(patterns, function (i, item) {
-            
+
             var temp = item.split(",").filter(item => item.trim().length > 0)
             var array = []
 
             for (let i = 0; i < temp.slice(0, -2).length + 1; i++) {
                 var arr = []
-                for (let j = 0; j <  temp.slice(0, -2).length + 1; j++) {
+                for (let j = 0; j < temp.slice(0, -2).length + 1; j++) {
                     arr[j] = 0
                 }
                 array[i] = arr
@@ -566,10 +599,10 @@ function isValidLength(patterns, length) {
 
 }
 
-window.addEventListener( "pageshow", function ( event ) {
+window.addEventListener("pageshow", function (event) {
     var perfEntries = performance.getEntriesByType("navigation");
 
-if (perfEntries[0].type === "back_forward") {
-    location.reload();
-}
-  });
+    if (perfEntries[0].type === "back_forward") {
+        location.reload();
+    }
+});
