@@ -165,6 +165,7 @@ function setLength() {
 window.addEventListener('popstate', function (event) {
     setPermutationElements();
     setPatternType();
+    setContainment();
     var url = new URL(document.location);
     var urlParams = url.searchParams;
 
@@ -278,21 +279,18 @@ function deletePatternUrl(pattern) {
         allpatterns[i] = "-" + allpatterns[i] + ","
     });
 
-
-    if (index) {
-        allpatterns.splice(index, 1)
-    } 
-    allpatterns = allpatterns.reduce(function (prev, next) {
-        return prev.concat(next);
-    })
+    if (index != null) {
+        allpatterns = allpatterns.splice(index)
+        if (index == 0 && allpatterns.length == 1) {
+            urlParams.delete("patterns")
+        }
+        else {
+            urlParams.set("patterns", allpatterns)
+        }
+    }
+    
 
     sessionStorage.setItem("total", sessionStorage.getItem("total") - 1)
-    if (allpatterns.length == 0) {
-        urlParams.delete("patterns")
-    }
-    else {
-        urlParams.set("patterns", allpatterns)
-    }
 
     window.history.pushState({}, '', url);
 }
