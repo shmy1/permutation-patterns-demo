@@ -267,7 +267,6 @@ $(document).on('click', '#deletepatternbtn', function () {
 function deletePatternUrl(pattern) {
     var url = new URL(document.location);
     var urlParams = url.searchParams;
-    console.log(urlParams.get("patterns"))
     var allpatterns = urlParams.get("patterns").split("-").filter(item => item.trim().length > 0)
     var toRemove = pattern.permutation.split(",").concat([pattern.patterntype, pattern.containment])
     var index = null;
@@ -338,7 +337,6 @@ $(document).on('click', '#solvebtn', function () {
                             .then(json => {
                                 sessionStorage.clear();
                                 localStorage.setItem(json.jobid, new URL(document.location));
-                                console.log(json.jobid)
                                 getResult(json.jobid, statistics);
                             })
                             .catch((err) => {
