@@ -278,9 +278,8 @@ function deletePatternUrl(pattern) {
         }
         allpatterns[i] = "-" + allpatterns[i] + ","
     });
-
     if (index != null) {
-        allpatterns = allpatterns.splice(index)
+        allpatterns.splice(index)
         if (index == 0 && allpatterns.length == 1) {
             urlParams.delete("patterns")
         }
