@@ -149,7 +149,7 @@ $(document).on('change', '#include', function () {
 $(document).on('change', '#length', function () {
     var currenturl = new URL(window.location);
     currenturl.searchParams.set("length", $(this).val());
-    if($(this).val() == "") {
+    if ($(this).val() == "") {
         currenturl.searchParams.delete("length")
     }
     window.history.pushState({}, '', currenturl);
@@ -158,7 +158,7 @@ $(document).on('change', '#length', function () {
 
 function setLength() {
     var currenturl = new URL(window.location);
-    if(currenturl.searchParams.get("length")) {
+    if (currenturl.searchParams.get("length")) {
         $("#length").val(currenturl.searchParams.get("length"))
     }
 }
@@ -267,10 +267,25 @@ $(document).on('click', '#deletepatternbtn', function () {
 function deletePatternUrl(pattern) {
     var url = new URL(document.location);
     var urlParams = url.searchParams;
+    console.log(urlParams.get("patterns"))
+    var allpatterns = urlParams.get("patterns").split("-").filter(item => item.trim().length > 0)
+    var toRemove = pattern.permutation.split(",").concat([pattern.patterntype, pattern.containment])
+    var index = null;
 
-    var allpatterns = urlParams.get("patterns").split(",")
-    var toRemove = ["-", pattern.patterntype, pattern.containment].concat(pattern.permutation.split(","))
-    allpatterns = allpatterns.filter(x => !toRemove.includes(x));
+    $.each(allpatterns, function (i, item) {
+        if (JSON.stringify(item.split(",").filter(item => item.trim().length > 0)) === JSON.stringify(toRemove)) {
+            index = i;
+        }
+        allpatterns[i] = "-" + allpatterns[i] + ","
+    });
+
+
+    if (index) {
+        allpatterns.splice(index, 1)
+    } 
+    allpatterns = allpatterns.reduce(function (prev, next) {
+        return prev.concat(next);
+    })
 
     sessionStorage.setItem("total", sessionStorage.getItem("total") - 1)
     if (allpatterns.length == 0) {
@@ -290,7 +305,6 @@ $(document).on('click', '#solvebtn', function () {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
     var length = document.getElementById("length").value
-
     if (!isValidLength(patterns, length)) {
         document.getElementById("length").classList.add('is-invalid')
     }
@@ -381,7 +395,7 @@ function setPropertyChoices() {
     var url = new URL(document.location);
     var chosen = url.searchParams.get("property")
 
-    if(chosen) {
+    if (chosen) {
         chosen = chosen.split(",").filter(item => item.trim().length > 0)
         $.each(chosen, function (i, item) {
             $("#" + item).prop("checked", true)
@@ -435,20 +449,20 @@ $(document).on('change', ':checkbox', function () {
     }
 
     var id = $(this).attr("id") + ","
-    
+
     var currenturl = new URL(window.location);
-    if(id.includes("prop")) {
-        if(!$(this).prop( "checked" )) {
+    if (id.includes("prop")) {
+        if (!$(this).prop("checked")) {
             id = currenturl.searchParams.get("property").split(",").filter(item => item.trim().length > 0)
             id = id.filter(item => item !== $(this).attr("id"))
         }
         else {
-            if(currenturl.searchParams.get("property")) {
+            if (currenturl.searchParams.get("property")) {
                 id = currenturl.searchParams.get("property").split(",").filter(item => item.trim().length > 0).concat(id)
             }
         }
 
-        if(id.length == 0) {
+        if (id.length == 0) {
             currenturl.searchParams.delete('property');
         }
         else {
