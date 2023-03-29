@@ -123,8 +123,6 @@ function resetParams() {
     urlParams.delete("id")
     urlParams.delete("permutation")
     urlParams.delete("contain")
-    urlParams.delete("property")
-    urlParams.delete("length")
     urlParams.set('type', 1);
     window.history.pushState({}, '', url);
     dispatchEvent(new PopStateEvent('popstate', {}));
@@ -151,6 +149,9 @@ $(document).on('change', '#include', function () {
 $(document).on('change', '#length', function () {
     var currenturl = new URL(window.location);
     currenturl.searchParams.set("length", $(this).val());
+    if($(this).val() == "") {
+        currenturl.searchParams.delete("length")
+    }
     window.history.pushState({}, '', currenturl);
 }
 );
@@ -323,6 +324,7 @@ $(document).on('click', '#solvebtn', function () {
                             .then(json => {
                                 sessionStorage.clear();
                                 localStorage.setItem(json.jobid, new URL(document.location));
+                                console.log(json.jobid)
                                 getResult(json.jobid, statistics);
                             })
                             .catch((err) => {
