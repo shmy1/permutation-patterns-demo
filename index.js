@@ -287,7 +287,7 @@ function deletePatternUrl(pattern) {
             urlParams.set("patterns", allpatterns)
         }
     }
-    
+
 
     sessionStorage.setItem("total", sessionStorage.getItem("total") - 1)
 
@@ -300,49 +300,53 @@ $(document).on('click', '#solvebtn', function () {
     for (let i = 0; i < numberPatterns; i++) {
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
-    var length = document.getElementById("length").value
-    if (!isValidLength(patterns, length)) {
-        document.getElementById("length").classList.add('is-invalid')
+    if (patterns.length == 0) {
+        $('#noPatterns').modal('show');
     }
-
     else {
-        var props = getCheckedBoxes(JSON.parse(`${environment.properties}`), null, "property");
-        var statistics = getCheckedBoxes(JSON.parse(`${environment.statistics}`), "#all-statistic", "statistic");
-        var underlying = getPatterns(patterns);
+        var length = document.getElementById("length").value
+        if (!isValidLength(patterns, length)) {
+            document.getElementById("length").classList.add('is-invalid')
+        }
+
+        else {
+            var props = getCheckedBoxes(JSON.parse(`${environment.properties}`), null, "property");
+            var statistics = getCheckedBoxes(JSON.parse(`${environment.statistics}`), "#all-statistic", "statistic");
+            var underlying = getPatterns(patterns);
 
 
-        var inputs = $.extend({ length: parseInt(length) }, props, underlying)
-        fetch("empty.json")
-            .then(response => response.json())
-            .then(json => {
-                var emptyData = json
-                fetch('combined.essence')
-                    .then(response => response.text())
-                    .then((data) => {
-                        var details = {
-                            model: data,
-                            data: JSON.stringify(Object.assign(emptyData, inputs)),
-                            solver: "minion",
-                            conjure_options: ["--number-of-solutions", "10000"]
-                        }
-                        fetch("https://demos.constraintmodelling.org/server/submit", {
-                            method: 'POST', headers: {
-                                'Content-Type': 'application/json'
-                            }, body: JSON.stringify(details)
-                        })
-                            .then(response => response.json())
-                            .then(json => {
-                                sessionStorage.clear();
-                                localStorage.setItem(json.jobid, new URL(document.location));
-                                getResult(json.jobid, statistics);
+            var inputs = $.extend({ length: parseInt(length) }, props, underlying)
+            fetch("empty.json")
+                .then(response => response.json())
+                .then(json => {
+                    var emptyData = json
+                    fetch('combined.essence')
+                        .then(response => response.text())
+                        .then((data) => {
+                            var details = {
+                                model: data,
+                                data: JSON.stringify(Object.assign(emptyData, inputs)),
+                                solver: "minion",
+                                conjure_options: ["--number-of-solutions", "10000"]
+                            }
+                            fetch("https://demos.constraintmodelling.org/server/submit", {
+                                method: 'POST', headers: {
+                                    'Content-Type': 'application/json'
+                                }, body: JSON.stringify(details)
                             })
-                            .catch((err) => {
-                                console.error(err);
-                            });
-                    })
-            });
+                                .then(response => response.json())
+                                .then(json => {
+                                    sessionStorage.clear();
+                                    localStorage.setItem(json.jobid, new URL(document.location));
+                                    getResult(json.jobid, statistics);
+                                })
+                                .catch((err) => {
+                                    console.error(err);
+                                });
+                        })
+                });
+        }
     }
-
 });
 
 function getResult(id, statistics) {
