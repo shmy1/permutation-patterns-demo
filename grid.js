@@ -96,9 +96,18 @@ function loadGrid(pattern) {
 
 if (representation == 2 || representation == 3) {
     column.on('click', function (d) {
-        d.click++;
+        data.forEach(function (value) {
+            value.forEach(function (item) {
+                if(item.column == d.column) {
+                    item.click++;
+                }
+            })
+            
+        })
+
         if ((d.click) % 2 == 0) {
             row.selectAll(".column_" + d.column).style("fill", "#FFFFFF");
+            
             if (representation == 3) {
                 grid.selectAll(".square").each(function(square) {
                     if(!(square.row == 0 || square.row == permutation.length)) {
@@ -117,6 +126,7 @@ if (representation == 2 || representation == 3) {
                 })
             }
         }
+        
     });
 }
 

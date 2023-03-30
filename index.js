@@ -439,11 +439,16 @@ $(document).on('change', ':checkbox', function () {
         });
     }
 
+    else if($('input:checkbox[id^="stat_"]').length === $('input:checkbox[id^="stat_"]:checked').length && !$("#all-statistic").is(':checked')) {
+        $("#all-statistic").prop('checked', true)
+    }
+
     else if ($(this).not(':checked')) {
         var id = $(this).attr("id")
         if (id.includes("stat")) {
             $("#all-statistic").prop('checked', false);
         }
+        
 
     }
 

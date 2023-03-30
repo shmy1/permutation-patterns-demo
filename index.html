@@ -49,10 +49,10 @@
         </button>
       </div>
       <div class="modal fade" id="userGuide" tabindex="-1" role="dialog" aria-labelledby="userGuide" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">User Guide</h5>
+              <h5 class="modal-title" id="userGuide">User Guide</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -62,7 +62,8 @@
                   there currently being a maximum of 5 underlying patterns that can be added.</strong></p>
               <p><em>Adding an underlying pattern:</em> </p>
               Enter a permutation and click submit to validate it. Doing this will show the appropriate visual
-              representation and show the button to add the underlying pattern.
+              representation and show the button to add the underlying pattern. Larger permutations (i.e. has a 
+              length > 9) should have spaces in between each digit.  
               <br> </br>
               Select one of the 6 pattern types and whether you want the pattern to be an avoidance or containment
               pattern.
@@ -104,7 +105,7 @@
         <label for="permutation" class="col-sm-auto align-self-center col-form-label pr-0">Permutation:</label>
         <div class="col-form-label col-sm-auto w-50 pl-0">
           <input required class="form-control" id="permutation" name="permutation" data-toggle="tooltip"
-            data-placement="top" title="Enter the permutation for a pattern here">
+            data-placement="top" title="Enter the permutation for a pattern here. Use spaces in between the digits for permutations of a length larger than 9.">
           <div class="invalid-feedback">
             Permutation is invalid
           </div>
@@ -214,9 +215,9 @@
       <label for="length" class="col-sm-auto align-self-center col-form-label pr-0 ">Length:</label>
       <div class="col-form-label col-sm-auto w-75 ">
         <input required class="form-control" id="length" name="length" type="number" data-toggle="tooltip"
-          data-placement="top" title="Enter a length (must be at least one larger than the shorterst pattern)">
+          data-placement="top" title="Enter a length that all solutions must be (at least one larger than the shortest pattern)">
         <div class="invalid-feedback">
-          Invalid length.
+          Invalid length. 
         </div>
       </div>
     </div>
