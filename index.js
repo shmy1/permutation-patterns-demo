@@ -386,7 +386,8 @@ $(document).on('click', '#solvebtn', function () {
                                 model: data,
                                 data: JSON.stringify(Object.assign(emptyData, inputs)), //all the required parameters have values
                                 solver: "minion",
-                                conjure_options: ["--number-of-solutions", "10000"]
+                                conjure_options: ["--number-of-solutions", "10000"],
+                                appName: "permutation-patterns"
                             }
                             fetch("https://demos.constraintmodelling.org/server/submit", { //access the conjure backend
                                 method: 'POST', headers: {

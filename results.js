@@ -14,7 +14,7 @@ function getResult() {
         fetch("https://demos.constraintmodelling.org/server/get", {
             method: 'POST', headers: {
                 'Content-Type': 'application/json'
-            },  body: JSON.stringify({ jobid: id })
+            },  body: JSON.stringify({ jobid: id, appName: "permutation-patterns" })
         }).then(response => response.json())
             .then(json => {
                 if (json.status == "wait") {
