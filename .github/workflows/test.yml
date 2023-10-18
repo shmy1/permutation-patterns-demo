@@ -1,0 +1,18 @@
+name: Build test
+
+on:
+  workflow_dispatch:        # can be triggered manually
+  pull_request:             # and for PRs
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          mkdir build
+          cp *.json *.js *.css *.html combined.essence build
+          touch build/.nojekyll
