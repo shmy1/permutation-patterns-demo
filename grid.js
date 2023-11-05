@@ -14,11 +14,11 @@ loadGrid(getPattern())
 function gridData() {
     var grid = document.getElementById("grid");
     var cs = getComputedStyle(grid.parentElement);
-    this.containerWidth = (grid.clientWidth - parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) - 5) * 0.65;
+    this.containerWidth = (grid.clientWidth - (2* parseFloat(cs.paddingLeft)) - 5) * 0.65;
     var number = num + 1
     var data = new Array();
     var xpos = (grid.clientWidth - this.containerWidth) / 2;
-    var ypos = 5;
+    var ypos = 0;
     this.width = this.containerWidth / number;
     this.height = this.width;
     var click = 0;
@@ -61,13 +61,12 @@ function loadGrid(pattern) {
     data = gridData();
 
     grid = d3.select("#grid")
-
-    grid.attr("height", containerWidth + 5);
+    grid.attr("height", containerWidth);
 
     var row = grid.selectAll(".row")
         .data(data)
         .enter().append("g")
-        .attr("class", "row align-items-center");
+        .attr("class", "align-items-center grid-r");
 
     var column = row.selectAll(".square")
         .data(function (d) { return d; })
@@ -87,7 +86,7 @@ function loadGrid(pattern) {
         var xpos = (document.getElementById("grid").clientWidth - this.containerWidth) / 2;
         grid.append("circle")
             .attr("cx", ((index + 1) * width) + xpos)
-            .attr("cy", (permutation.length - value + 1) * height + 5)
+            .attr("cy", (permutation.length - value + 1) * height)
             .attr("r", (permutation.length < 9 ? 15 - (permutation.length) * 1 : 15 - 8 * 1));
     }
 
@@ -244,7 +243,7 @@ function getPattern() {
 * Listens for a change in the URL -indicates that the permutation inputs have changed 
 */
 window.addEventListener('popstate', function (event) {
-    grid.selectAll(".row").remove()
+    grid.selectAll(".grid-r").remove()
     grid.selectAll("circle").remove()
 
     loadGrid(getPattern())
@@ -256,7 +255,7 @@ window.addEventListener('popstate', function (event) {
 $(document).on('click', '.pattern-input', function (e) {
     var url = new URL(document.location);
     var urlParams = url.searchParams;
-    var patternid = $(this).parent().attr("value");
+    var patternid = $(this).attr("id").split("-")[1];
     var pattern = JSON.parse(sessionStorage.getItem(patternid)); //gets its information
 
 
@@ -273,8 +272,8 @@ $(document).on('click', '.pattern-input', function (e) {
         $(this).prop("checked", true)
 
         $(".patternbtn").removeClass("selected-pattern")
-        $(this).parent().addClass("selected-pattern")
-        grid.selectAll(".row").remove()
+        $("#pattern-" + patternid).addClass("selected-pattern")
+        grid.selectAll(".grid-r").remove()
         grid.selectAll("circle").remove()
         loadGrid(pattern.pattern)
 
@@ -286,7 +285,7 @@ $(document).on('click', '.pattern-input', function (e) {
         urlParams.delete("permutation")
         urlParams.delete("id")
         urlParams.delete("contain")
-        $(this).parent().removeClass("selected-pattern")
+        $("#pattern-" + patternid).removeClass("selected-pattern")
         $(this).prop("checked", false)
 
         window.history.pushState({}, '', url);

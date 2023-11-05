@@ -46,16 +46,17 @@ function setPermutationElements() {
 * Add a button to represent an underlying pattern that has been added 
 */
 function addNewPattern(id, pattern) {
+
     const label = document.createElement("label"); 
     label.classList.add("btn"); 
-    label.classList.add("mr-4");
-    label.classList.add("mb-2");
+    label.classList.add("rounded")
     label.classList.add("patternbtn");
-    label.setAttribute("value", id)
+    label.setAttribute("for", "input-" + id)
     label.setAttribute("id", "pattern-" + id)
 
     const input = document.createElement("input")
     input.classList.add("pattern-input")
+    input.classList.add("btn-check")
     input.setAttribute("type", "checkbox")
     input.setAttribute("autocomplete", "off")
     input.setAttribute("data-toggle", "toggle")
@@ -69,8 +70,8 @@ function addNewPattern(id, pattern) {
 
 
     label.appendChild(span);
-    label.appendChild(input)
     document.getElementById("added-patterns-container").appendChild(label);
+    document.getElementById("added-patterns-container").appendChild(input);
 }
 
 /**
@@ -440,6 +441,7 @@ function setPropertyChoices() {
 
         var input = document.createElement("input")
         input.classList.add("form-check-input")
+        input.classList.add("me-2")
         input.setAttribute("type", "checkbox")
         input.setAttribute("name", "property")
         input.setAttribute("id", i)
@@ -479,6 +481,7 @@ function setStatisticChoices() {
 
         var input = document.createElement("input")
         input.classList.add("form-check-input")
+        input.classList.add("me-2")
         input.setAttribute("type", "checkbox")
         input.setAttribute("name", "property")
         input.setAttribute("id", i)
