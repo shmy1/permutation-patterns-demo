@@ -6,11 +6,8 @@ setup();
 function setup() {
     $('#deletepatternbtn').css("visibility", "hidden");
     setPermutationElements();
-    setPatternChoices();
     setPatternType();
     setContainment();
-    setPropertyChoices();
-    setStatisticChoices();
     setLength();
     sessionStorage.clear();
     sessionStorage.setItem("total", 0)
@@ -32,12 +29,11 @@ function setPermutationElements() {
         $('#addpatternbtn').css("visibility", "visible");
 
     }
-    else { 
+    else {
         $('#permutationbutton').val("Submit")
         $('#permutation').val("")
         $('#clearpattern').css("visibility", "hidden");
         $('#addpatternbtn').css("visibility", "hidden");
-
 
     }
 }
@@ -47,8 +43,8 @@ function setPermutationElements() {
 */
 function addNewPattern(id, pattern) {
 
-    const label = document.createElement("label"); 
-    label.classList.add("btn"); 
+    const label = document.createElement("label");
+    label.classList.add("btn");
     label.classList.add("rounded")
     label.classList.add("patternbtn");
     label.setAttribute("for", "input-" + id)
@@ -83,25 +79,6 @@ function updatePatternText(id, permutation) {
     var permutation = permutation.split(",")
     var text = permutation.length < 10 ? permutation.join('') : permutation.join(' ');
     span.text(text)
-}
-
-/**
-* Dynamically adding the pattern types to the selection field
-*/
-function setPatternChoices() {
-    Object.values(PatternType).forEach(type => {
-        $('#permrepresentation').append($('<option>', {
-            value: type.index,
-            text: type.name
-        }));
-    });
-
-    var currenturl = new URL(window.location);
-    if (!currenturl.searchParams.get("type")) { //automatically fills in the input if data is in the URL
-        currenturl.searchParams.set('type', 1);
-        window.history.pushState({}, '', currenturl);
-    }
-
 }
 
 /**
@@ -148,7 +125,7 @@ function resetParams() {
     urlParams.delete("permutation")
     urlParams.delete("contain")
     urlParams.set('type', 1);
-    window.history.pushState({}, '', url); 
+    window.history.pushState({}, '', url);
     dispatchEvent(new PopStateEvent('popstate', {})); //firest the pop state event
 }
 
@@ -266,7 +243,7 @@ $(document).on('click', '#addpatternbtn', function () {
     if ($(this).text().trim() === "Add Underlying Pattern") {
         var patternnumber = sessionStorage.getItem("total")
         //makes sure the maximum number of patterns hasn't been reached
-        if (patternnumber >= `${environment.max_patterns}`) { 
+        if (patternnumber >= `${environment.max_patterns}`) {
             $('#maxPatterns').modal('show'); //show popup alert
         }
         else { //store the new pattern
@@ -295,7 +272,7 @@ $(document).on('click', '#addpatternbtn', function () {
     sessionStorage.setItem("total", count) //updates the total number of patterns
 
     patternToUrl(JSON.parse(pattern)) //adds the pattern information to the URL
-    resetParams(url, urlParams); 
+    resetParams(url, urlParams);
 
 });
 
@@ -332,7 +309,7 @@ function deletePatternUrl(pattern) {
             index = i; //store the index
         }
         allpatterns[i] = "-" + allpatterns[i] + "," //ensure the data is formatted correctly
-    }); 
+    });
     if (index != null) { //if the pattern to be deleted was found
         allpatterns.splice(index) //remove it from the array of pattern information 
         if (index == 0 && allpatterns.length == 1) { //if there are no added patterns now
@@ -354,7 +331,7 @@ function deletePatternUrl(pattern) {
 */
 $(document).on('click', '#solvebtn', function () {
     var numberPatterns = sessionStorage.getItem("total");
-    let patterns = [] 
+    let patterns = []
     for (let i = 0; i < numberPatterns; i++) { //gets all the added patterns
         patterns[i] = JSON.parse(sessionStorage.getItem(i));
     }
@@ -435,76 +412,13 @@ function getResult(id, statistics) {
 }
 
 /**
-* Dynamically adds the property choices that can be selected
-*/
-function setPropertyChoices() {
-    Object.values(Property).forEach(property => {
-        var input = document.createElement("input")
-        input.classList.add("form-check-input")
-        input.classList.add("me-2")
-        input.setAttribute("type", "checkbox")
-        input.setAttribute("name", "property")
-        input.setAttribute("id", property.label)
-        input.setAttribute("value", property.label)
-
-        var label = document.createElement("label")
-        label.classList.add("form-check-label")
-        label.appendChild(input)
-        label.appendChild(document.createTextNode(property.name))
-
-        var div = document.createElement("div")
-        div.classList.add("form-check-inline")
-        div.appendChild(label)
-        $('#property_choices').append(div);
-    });
-
-    var url = new URL(document.location);
-    var chosen = url.searchParams.get("property")
-
-    //automatically fills in the input if data is in the URL 
-    if (chosen) {
-        chosen = chosen.split(",").filter(item => item.trim().length > 0)
-        $.each(chosen, function (i, item) {
-            $("#" + item).prop("checked", true)
-        });
-    }
-
-}
-
-/**
-* Dynamically adds the stastic choices that can be selected
-*/
-function setStatisticChoices() {
-    Object.values(Statistic).forEach(stat => {
-        var input = document.createElement("input")
-        input.classList.add("form-check-input")
-        input.classList.add("me-2")
-        input.setAttribute("type", "checkbox")
-        input.setAttribute("name", "property")
-        input.setAttribute("id", stat.label)
-        input.setAttribute("value", stat.label)
-
-        var label = document.createElement("label")
-        label.classList.add("form-check-label")
-        label.appendChild(input)
-        label.appendChild(document.createTextNode(stat.name))
-
-        var div = document.createElement("div")
-        div.classList.add("form-check-inline")
-        div.appendChild(label)
-        $('#statistic_choices').append(div);
-    });
-
-}
-
-/**
 * Handles if a checkbox is checked or unchecked
 */
 $(document).on('change', ':checkbox', function () {
     if ($(this).attr("id") === "all-statistic") { //if it is the all checkbox
         var check = false;
         if ($("#all-statistic").is(':checked')) { //if it has been checked
-            check = true; 
+            check = true;
         }
         $('input:checkbox[id^="stat_"]').each(function () {
             $(this).prop('checked', check); //checks or unchecks all the statistic checkboxes
@@ -512,7 +426,7 @@ $(document).on('change', ':checkbox', function () {
     }
 
     //if all the statistic checkboxes except for the "all" checkbox is checked
-    else if($('input:checkbox[id^="stat_"]').length === $('input:checkbox[id^="stat_"]:checked').length && !$("#all-statistic").is(':checked')) {
+    else if ($('input:checkbox[id^="stat_"]').length === $('input:checkbox[id^="stat_"]:checked').length && !$("#all-statistic").is(':checked')) {
         $("#all-statistic").prop('checked', true) //also check the "all" checkbox
     }
 
@@ -521,7 +435,7 @@ $(document).on('change', ':checkbox', function () {
         if (id.includes("stat")) {
             $("#all-statistic").prop('checked', false);
         }
-        
+
 
     }
 
@@ -608,7 +522,7 @@ function getPatterns(patterns) {
         if (grid_pattern) {
             pattern = [perm, grid_pattern]
         }
-        
+
         //convert object to key/value array
         const asArray = Object.entries(PatternType);
         const filtered = asArray.filter(([_, value]) => value.index == element.patterntype)
