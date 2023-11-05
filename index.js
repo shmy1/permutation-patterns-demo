@@ -4,7 +4,7 @@ setup();
 * Runs everytime the page is reloaded - resets everything
 */
 function setup() {
-    $('#deletepatternbtn').css("visibility", "hidden");
+    changeButtonVisiblity($('#deletepatternbtn'), false);
     setPermutationElements();
     setPatternType();
     setContainment();
@@ -21,19 +21,19 @@ function setup() {
 function setPermutationElements() {
     var url = new URL(document.location);
     var params = url.searchParams;
-    if (params.get('permutation')) { //the field needs to be filled
+    if (params.get('permutation')) { //the field needs to be populated
         var permutation = params.get('permutation').split(',')
-        $('#permutation').val(permutation.length < 10 ? permutation.join('') : permutation.join(' ')); //formats the permutation appropriately 
+        $('#permutation').val(formatPermutation(permutation)); 
         $('#permutationbutton').val("Resubmit")
-        $('#clearpattern').css("visibility", "visible");
-        $('#addpatternbtn').css("visibility", "visible");
+        changeButtonVisiblity($('#clearpattern'), true);
+        changeButtonVisiblity($('#addpatternbtn'), true);
 
     }
     else {
         $('#permutationbutton').val("Submit")
-        $('#permutation').val("")
-        $('#clearpattern').css("visibility", "hidden");
-        $('#addpatternbtn').css("visibility", "hidden");
+        $('#permutation').val("") 
+        changeButtonVisiblity($('#clearpattern'), false);
+        changeButtonVisiblity($('#addpatternbtn'), false);
 
     }
 }
@@ -62,7 +62,7 @@ function addNewPattern(id, pattern) {
 
     const span = document.createElement("span")
     //formatting the permutation to add to the button
-    span.appendChild(document.createTextNode(permutation.length < 10 ? permutation.join('') : permutation.join(' ')))
+    span.appendChild(document.createTextNode(formatPermutation(permutation)))
 
 
     label.appendChild(span);
@@ -77,7 +77,7 @@ function updatePatternText(id, permutation) {
     var span = $("#pattern-" + id + " span")
 
     var permutation = permutation.split(",")
-    var text = permutation.length < 10 ? permutation.join('') : permutation.join(' ');
+    var text = formatPermutation(permutation);
     span.text(text)
 }
 
@@ -189,13 +189,13 @@ window.addEventListener('popstate', function (event) {
     if (urlParams.get("id")) {
         $('#addpatternbtn').val("update")
         $('#addpatternbtn').text("Update Pattern")
-        $('#deletepatternbtn').css("visibility", "visible");
+        changeButtonVisiblity($('#deletepatternbtn'), true)
     }
 
     else {
         $('#addpatternbtn').val("add")
         $('#addpatternbtn').text("Add Underlying Pattern")
-        $('#deletepatternbtn').css("visibility", "hidden");
+        changeButtonVisiblity($('#deletepatternbtn'), false)
     }
 
 
