@@ -1,42 +1,45 @@
-//the choices for pattern types
-var representation = JSON.stringify({
-  "1": "Classical",
-  "2": "Vincular",
-  "3": "Bivincular",
-  "4": "Mesh",
-  "5": "Boxed Mesh",
-  "6": "Consecutive Patterns",
-});
+class PatternType {
+  static Classical = new PatternType("1", "Classical", "classic_");
+  static Vincular = new PatternType("2", "Vincular", "vincular_");
+  static Bivincular = new PatternType("3", "Bivincular", "bivincular_");
+  static Mesh = new PatternType("4", "Mesh", "mesh_");
+  static BoxedMesh = new PatternType("5", "Boxed Mesh", "boxed_mesh_");
+  static ConsecutivePatterns = new PatternType("6", "Consecutive Patterns", "consecutive_");
 
-//the properties that have been implemented and can be selected
-var property = JSON.stringify({
-  "prop_simple": "Simple",
-  "prop_block_wise_simple": "Block-wise Simple",
-  "prop_plus_decomposable": "Plus Decomposable",
-  "prop_mins_decomposable": "Minus Decomposable",
-  "prop_involution": "Involution",
-  "prop_derangement": "Derangement",
-  "prop_non_derangement": "Non-derangement"
-})
+  constructor(index, name, label) {
+    this.index = index;
+    this.name = name;
+    this.label = label;
+  }
+}
 
-//the pattern types and their corresponding parameter label 
-var pattern_names = JSON.stringify({
-  "Classical": "classic_",
-  "Vincular": "vincular_",
-  "Bivincular": "bivincular_",
-  "Mesh": "mesh_",
-  "Boxed Mesh": "boxed_mesh_",
-  "Consecutive Patterns": "consecutive_",
-})
+class Property {
+  static Simple = new Property("Simple", "prop_simple");
+  static BlockwiseSimple = new Property("Block-wise Simple", "prop_block_wise_simple");
+  static PlusDecomposable = new Property("Plus Decomposable", "prop_plus_decomposable");
+  static MinusDecomposable = new Property("Minus Decomposable", "prop_mins_decomposable");
+  static Involution = new Property("Involution", "prop_involution");
+  static Derangement = new Property("Derangement", "prop_derangement");
+  static NonDerangement = new Property("Non-derangement", "prop_non_derangement");
 
-//the statistic choices
-var statistic = JSON.stringify({
-  "stat_ascentCount": "Ascent Count",
-  "stat_descentCount": "Descent Count",
-  "stat_excedanceCount": "Excedance Count",
-  "stat_inversionCount": "Inversion Count",
-  "stat_majorIndex": "Major Index",
-})
+  constructor(name, label) {
+    this.name = name;
+    this.label = label;
+  }
+}
+
+class Statistic {
+  static AscentCount = new Statistic("Ascent Count", "stat_ascentCount");
+  static DescentCount = new Statistic("Descent Count", "stat_descentCount");
+  static ExcedanceCount = new Statistic("Excedance Count", "stat_excedanceCount");
+  static InversionCount = new Statistic("Inversion Count", "stat_inversionCount");
+  static MajorIndex = new Statistic("Major Index", "stat_majorIndex");
+
+  constructor(name, label) {
+    this.name = name;
+    this.label = label;
+  }
+}
 
 //the possible patterns that can be input (each pattern type can have avoidance and containment) 
 var patterns = JSON.stringify({
@@ -54,13 +57,7 @@ var patterns = JSON.stringify({
   "consecutive_avoidance": [],
 })
 
-
-
 var environment = {
-  "representation": representation,
-  "properties": property,
   "max_patterns": 5, //the maximum number of underlying patterns that can added as part of a permutation problem
-  "pattern_types": patterns,
-  "pattern_names":pattern_names,
-  "statistics" : statistic,
+  "patterns": patterns,
 }

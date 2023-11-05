@@ -89,11 +89,10 @@ function updatePatternText(id, permutation) {
 * Dynamically adding the pattern types to the selection field
 */
 function setPatternChoices() {
-    var representations = JSON.parse(`${environment.representation}`) //stored as a global variable
-    $.each(representations, function (i, item) {
+    Object.values(PatternType).forEach(type => {
         $('#permrepresentation').append($('<option>', {
-            value: i,
-            text: item
+            value: type.index,
+            text: type.name
         }));
     });
 
@@ -370,8 +369,11 @@ $(document).on('click', '#solvebtn', function () {
 
         else {
             //gets the search state inputs
-            var props = getCheckedBoxes(JSON.parse(`${environment.properties}`), null, "property");
-            var statistics = getCheckedBoxes(JSON.parse(`${environment.statistics}`), "#all-statistic", "statistic");
+            var properties = Object.values(Property).map(({ label }) => label)
+            var stats = Object.values(Statistic).map(({ label }) => label)
+
+            var props = getCheckedBoxes(properties, null, "property");
+            var statistics = getCheckedBoxes(stats, "#all-statistic", "statistic");
             var underlying = getPatterns(patterns);
 
 
@@ -436,27 +438,24 @@ function getResult(id, statistics) {
 * Dynamically adds the property choices that can be selected
 */
 function setPropertyChoices() {
-    var properties = JSON.parse(`${environment.properties}`) //stored in a global variable
-    $.each(properties, function (i, item) {
-
+    Object.values(Property).forEach(property => {
         var input = document.createElement("input")
         input.classList.add("form-check-input")
         input.classList.add("me-2")
         input.setAttribute("type", "checkbox")
         input.setAttribute("name", "property")
-        input.setAttribute("id", i)
-        input.setAttribute("value", i)
+        input.setAttribute("id", property.label)
+        input.setAttribute("value", property.label)
 
         var label = document.createElement("label")
         label.classList.add("form-check-label")
         label.appendChild(input)
-        label.appendChild(document.createTextNode(item))
+        label.appendChild(document.createTextNode(property.name))
 
         var div = document.createElement("div")
         div.classList.add("form-check-inline")
         div.appendChild(label)
         $('#property_choices').append(div);
-
     });
 
     var url = new URL(document.location);
@@ -476,27 +475,24 @@ function setPropertyChoices() {
 * Dynamically adds the stastic choices that can be selected
 */
 function setStatisticChoices() {
-    var statistics = JSON.parse(`${environment.statistics}`)
-    $.each(statistics, function (i, item) {
-
+    Object.values(Statistic).forEach(stat => {
         var input = document.createElement("input")
         input.classList.add("form-check-input")
         input.classList.add("me-2")
         input.setAttribute("type", "checkbox")
         input.setAttribute("name", "property")
-        input.setAttribute("id", i)
-        input.setAttribute("value", i)
+        input.setAttribute("id", stat.label)
+        input.setAttribute("value", stat.label)
 
         var label = document.createElement("label")
         label.classList.add("form-check-label")
         label.appendChild(input)
-        label.appendChild(document.createTextNode(item))
+        label.appendChild(document.createTextNode(stat.name))
 
         var div = document.createElement("div")
         div.classList.add("form-check-inline")
         div.appendChild(label)
         $('#statistic_choices').append(div);
-
     });
 
 }
@@ -590,10 +586,7 @@ function getCheckedBoxes(list, all, id) {
 * @param patterns   the underlying patterns
 */
 function getPatterns(patterns) {
-    var pattern_types = JSON.parse(`${environment.pattern_types}`)
-    var representation = JSON.parse(`${environment.representation}`)
-    var names = JSON.parse(`${environment.pattern_names}`)
-
+    var pattern_types = JSON.parse(`${environment.patterns}`)
 
     patterns.forEach((element, index) => {
         //whether it is a containment or avoidance pattern
@@ -609,28 +602,34 @@ function getPatterns(patterns) {
         })
         patterns[index].permutation = perm
 
-        var representation_name = representation[element.patterntype] //gets the approriate pattern name
-        var grid_pattern = getGridPattern(representation_name, element) //gets the appropriate shaded pattern 
+        var grid_pattern = getGridPattern(element) //gets the appropriate shaded pattern 
 
         var pattern = perm
         if (grid_pattern) {
             pattern = [perm, grid_pattern]
         }
+        
+        //convert object to key/value array
+        const asArray = Object.entries(PatternType);
+        const filtered = asArray.filter(([_, value]) => value.index == element.patterntype)
 
-        pattern_types[names[representation_name] + containment].push(pattern); //adds the pattern to the correct paramter
+        //convert back into object
+        var obj = Object.fromEntries(filtered)
+
+        pattern_types[(Object.values(obj)[0]).label + containment].push(pattern); //adds the pattern to the correct paramter
 
     });
 
     return pattern_types
 }
 
-function getGridPattern(name, pattern) {
-    switch (name) {
-        case "Vincular":
+function getGridPattern(permutation) {
+    switch (permutation.patterntype) {
+        case PatternType.Vincular.index:
             return getColumns(pattern.pattern)
-        case "Bivincular":
+        case PatternType.Bivincular.index:
             return getColumns(pattern.pattern)
-        case "Mesh":
+        case PatternType.Mesh.index:
             return getCells(pattern.pattern)
 
     }
