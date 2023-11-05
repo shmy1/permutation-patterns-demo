@@ -54,7 +54,6 @@ function updatePatternText(id, permutation) {
     span.text(text)
 }
 
-
 /**
 * Reset the URL parameters related to the underlying pattern section
 */
@@ -67,69 +66,8 @@ function resetParams() {
     urlParams.delete("contain")
     urlParams.set('type', 1);
     window.history.pushState({}, '', url);
-    dispatchEvent(new PopStateEvent('popstate', {})); //firest the pop state event
+    dispatchEvent(new PopStateEvent('popstate', {})); //fires the pop state event
 }
-
-
-/**
-* Handles if the pattern type changes
-*/
-$(document).on('change', '#permrepresentation', function () {
-    var currenturl = new URL(window.location);
-    currenturl.searchParams.set('type', $('#permrepresentation').find("option:selected").attr('value'));
-    window.history.pushState({}, '', currenturl); //update the url
-
-    dispatchEvent(new PopStateEvent('popstate', {}));
-}
-);
-
-/**
-* Handles if the containment choice changes
-*/
-$(document).on('change', '#include', function () {
-    var currenturl = new URL(window.location);
-    currenturl.searchParams.set("contain", $('#include input:checked').attr("value"));
-    window.history.pushState({}, '', currenturl);
-    dispatchEvent(new PopStateEvent('popstate', {}));
-}
-);
-
-/**
-* Handles if the length input changes
-*/
-$(document).on('change', '#length', function () {
-    var currenturl = new URL(window.location);
-    currenturl.searchParams.set("length", $(this).val());
-    if ($(this).val() == "") { //if no length is entered
-        currenturl.searchParams.delete("length")
-    }
-    window.history.pushState({}, '', currenturl);
-}
-);
-
-/**
-* Handles if there is a change in the URL relating to the underlying pattern inputs 
-*/
-window.addEventListener('popstate', function (event) {
-    setUnderlyingPatternFields();
-    var url = new URL(document.location);
-    var urlParams = url.searchParams;
-
-    if (urlParams.get("id")) {
-        $('#addpatternbtn').val("update")
-        $('#addpatternbtn').text("Update Pattern")
-        changeButtonVisiblity($('#deletepatternbtn'), true)
-    }
-
-    else {
-        $('#addpatternbtn').val("add")
-        $('#addpatternbtn').text("Add Underlying Pattern")
-        changeButtonVisiblity($('#deletepatternbtn'), false)
-    }
-
-
-
-});
 
 /**
 * Handles adding and updating an underlying pattern
@@ -322,13 +260,12 @@ $(document).on('click', '#solvebtn', function () {
 * Redirects the user to the results page
 */
 function getResult(id, statistics) {
-
     var stats = []
-    for (var stat in statistics) {
-        if (statistics[stat]) {
-            stats.push(stat.split("_")[1]) //gets the selected statistic choices
+    $.each(statistics, function (i, item) {
+        if(statistics[item]) {
+            stats.push(item.split("_")[1]) //gets the selected statistic choices
         }
-    }
+    });
 
     var url = "result.html?id=" + id //job id from the solver
 
@@ -393,36 +330,6 @@ $(document).on('change', ':checkbox', function () {
     }
 }
 );
-
-/**
-* Gets all the checkboxes that have been checked for a certain input field
-* @param list   all the checkboxes for that input field
-* @param all    the all checkbox if it exists for that input field
-* @param id     which input field it is
-*/
-function getCheckedBoxes(list, all, id) {
-    var checked = false;
-    if (all) {
-        if ($(all).is(':checked')) {
-            checked = true;
-        }
-    }
-
-    $.each(list, function (i, item) {
-        list[i] = checked;
-    });
-
-    var selection = 'input:checkbox[id^="prop_"]:checked'
-    if (id === "statistic") {
-        selection = 'input:checkbox[id^="stat_"]:checked'
-    }
-
-    $(selection).each(function () {
-        list[$(this).attr("id")] = true;
-    });
-
-    return list;
-}
 
 /**
 * Formats all the added underlying patterns appropriately
@@ -559,7 +466,6 @@ function isValidLength(patterns, length) {
 
     var min = (arr.reduce((a, b) => a.length <= b.length ? a : b)).split(",").length
     return min < length
-
 
 }
 

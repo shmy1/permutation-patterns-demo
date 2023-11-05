@@ -1,9 +1,7 @@
-var url = new URL(document.location);
-var urlParams = url.searchParams;
-var id = urlParams.get("id")
+var id = getURLParam("id");
 
-$('#new-btn').css("visibility", "hidden");
-$('#edit-btn').css("visibility", "hidden");
+changeButtonVisiblity($('#edit-btn'), false);
+changeButtonVisiblity($('#new-btn'), false);
 
 getResult();
 
@@ -14,7 +12,7 @@ function getResult() {
         fetch("https://conjure-aas.cs.st-andrews.ac.uk/get", {
             method: 'POST', headers: {
                 'Content-Type': 'application/json'
-            },  body: JSON.stringify({ jobid: id, appName: "permutation-patterns" })
+            }, body: JSON.stringify({ jobid: id, appName: "permutation-patterns" })
         }).then(response => response.json())
             .then(json => {
                 if (json.status == "wait") {
@@ -31,14 +29,11 @@ function getResult() {
                         document.getElementById("result-container").textContent = JSON.stringify(json, undefined, 2);
                     }
                     if (localStorage.getItem(id)) {
-                        $('#edit-btn').css("visibility", "visible");
+                        changeButtonVisiblity($('#edit-btn'), true);
                     }
-                    $('#new-btn').css("visibility", "visible");
+                    changeButtonVisiblity($('#new-btn'), true);
 
                 }
-
-                
-
             })
     }
 
@@ -61,22 +56,21 @@ function showResults(results) {
 }
 
 function showSolution(solution, stats) {
-    var statistics = JSON.parse(`${environment.statistics}`)
+    var statistics = Object.values(Statistic)
+    var filtered = statistics.filter(element => element.label == "stat_" + stats[0]);
 
     var li = document.createElement("li")
     var permutation = solution.perm
-    permutation = permutation.length < 10 ? permutation.join('') : permutation.join(' ')
-    li.appendChild(document.createTextNode("Permutation: " + permutation))
+    li.appendChild(document.createTextNode("Permutation: " + formatPermutation(permutation)))
 
     var div = document.createElement("div")
     div.classList.add("mb-3")
     div.appendChild(li)
-
     if (stats) {
         for (var i = 0; i < stats.length; i++) {
             var label = document.createElement("label")
             var statdiv = document.createElement("div")
-            label.appendChild(document.createTextNode(statistics["stat_" + stats[i]] + ": " + solution[stats[i]]))
+            label.appendChild(document.createTextNode(filtered[i].name + ": " + solution[stats[i]]))
             statdiv.appendChild(label)
             div.appendChild(statdiv)
         }
@@ -91,10 +85,10 @@ $(document).on('click', '#edit-btn', function () {
     }
 });
 
-$(document).on('click', '#new-btn', function() {
+$(document).on('click', '#new-btn', function () {
     var url = new URL(document.location);
     url.searchParams.delete("id");
     window.history.pushState({}, '', url);
     window.location.href = window.location.href.replace(window.location.pathname.split('/').pop(), '')
-    
+
 })
