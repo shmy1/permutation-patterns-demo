@@ -17,3 +17,21 @@ function changeButtonVisiblity(button, show) {
     }
 
 }
+
+function getURLParam(parameter) {
+    var url = new URL(document.location);
+    var params = url.searchParams;
+
+    return params.get(parameter);
+}
+
+function showPermutationButtons(show) {
+    var submitPermBtn = $('#permutationbutton')
+    show ? setElementValue(submitPermBtn, "Resubmit") : setElementValue(submitPermBtn, "Submit");
+    changeButtonVisiblity($('#clearpattern'), show);
+    changeButtonVisiblity($('#addpatternbtn'), show);
+}
+
+function setElementValue(element, value) {
+    element.val(value);
+}

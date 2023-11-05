@@ -1,11 +1,22 @@
 populateFields();
 /**
-* Populates all the input fields that have a set of choices to select from.
+* Populates all the input fields
 */
 function populateFields() {
+    //Dynamically adds all the options to the input fields that have a set of choices to select from.
     setPatternChoices();
     setPropertyChoices();
     setStatisticChoices();
+
+    //Automatically fills the input field in with a value if indicated by the URL
+    setUnderlyingPatternFields();
+    setLength();
+}
+
+function setUnderlyingPatternFields() {
+    setPermutationElements();
+    setPatternType();
+    setContainment();
 }
 
 /**
@@ -90,4 +101,48 @@ function createCheckbox(value, text) {
     label.appendChild(document.createTextNode(text))
 
     return label;
+}
+
+/**
+* Automatically fills the permutation input field if indicated by the URL
+*/
+function setPermutationElements() {
+    var urlPermutation = getURLParam('permutation');
+    var permInput = $('#permutation')
+    urlPermutation ? setElementValue(permInput, formatPermutation(urlPermutation.split(','))) : setElementValue(permInput, "");
+    showPermutationButtons(urlPermutation)
+}
+
+/**
+* Automatically fills the pattern type input field if indicated by the URL
+*/
+function setPatternType() {
+    var urlType = getURLParam('type');
+    urlType ? setElementValue($('#permrepresentation'), urlType) : "";
+}
+
+/**
+* Automatically fills the containment input field if indicated by the URL
+*/
+function setContainment() {
+    var urlContainment = getURLParam('contain');
+    if (urlContainment) {
+        var selection = $('input:radio[name="containment"]') //the containment and avoidance radio buttons
+        $.each(selection, function (i, item) {
+            if ($(this).val() != urlContainment) { //if its not what is indicated in the URL
+                $(this).prop("checked", false)
+            }
+            else {
+                $(this).prop("checked", true)
+            }
+        });
+    }
+}
+
+/**
+* Automatically fills the length input field if indicated by the URL
+*/
+function setLength() {
+    var urlLength = getURLParam('length');
+    urlLength ? setElementValue($('#length'), urlLength) : "";
 }

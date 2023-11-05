@@ -5,37 +5,10 @@ setup();
 */
 function setup() {
     changeButtonVisiblity($('#deletepatternbtn'), false);
-    setPermutationElements();
-    setPatternType();
-    setContainment();
-    setLength();
     sessionStorage.clear();
     sessionStorage.setItem("total", 0)
     UrlToPattern();
 
-}
-
-/**
-* Automatically fills the permutation input field if indicated by the URL
-*/
-function setPermutationElements() {
-    var url = new URL(document.location);
-    var params = url.searchParams;
-    if (params.get('permutation')) { //the field needs to be populated
-        var permutation = params.get('permutation').split(',')
-        $('#permutation').val(formatPermutation(permutation)); 
-        $('#permutationbutton').val("Resubmit")
-        changeButtonVisiblity($('#clearpattern'), true);
-        changeButtonVisiblity($('#addpatternbtn'), true);
-
-    }
-    else {
-        $('#permutationbutton').val("Submit")
-        $('#permutation').val("") 
-        changeButtonVisiblity($('#clearpattern'), false);
-        changeButtonVisiblity($('#addpatternbtn'), false);
-
-    }
 }
 
 /**
@@ -81,38 +54,6 @@ function updatePatternText(id, permutation) {
     span.text(text)
 }
 
-/**
-* Automatically fills the pattern type input field if indicated by the URL
-*/
-function setPatternType() {
-    var url = new URL(document.location);
-    var params = url.searchParams;
-
-    if (params.get('type')) {
-        var representation = params.get('type')
-        $('#permrepresentation').val(representation);
-    }
-}
-
-/**
-* Automatically fills the containment input field if indicated by the URL
-*/
-function setContainment() {
-    var url = new URL(document.location);
-    var params = url.searchParams;
-    if (params.get('contain')) {
-        var containment = params.get('contain')
-        var selection = $('input:radio[name="containment"]') //the containment and avoidance radio buttons
-        $.each(selection, function (i, item) {
-            if ($(this).val() != containment) { //if its not what is indicated in the URL
-                $(this).prop("checked", false)
-            }
-            else {
-                $(this).prop("checked", true)
-            }
-        });
-    }
-}
 
 /**
 * Reset the URL parameters related to the underlying pattern section
@@ -167,22 +108,10 @@ $(document).on('change', '#length', function () {
 );
 
 /**
-* Automatically fills the length input field if indicated by the URL
-*/
-function setLength() {
-    var currenturl = new URL(window.location);
-    if (currenturl.searchParams.get("length")) {
-        $("#length").val(currenturl.searchParams.get("length"))
-    }
-}
-
-/**
 * Handles if there is a change in the URL relating to the underlying pattern inputs 
 */
 window.addEventListener('popstate', function (event) {
-    setPermutationElements();
-    setPatternType();
-    setContainment();
+    setUnderlyingPatternFields();
     var url = new URL(document.location);
     var urlParams = url.searchParams;
 
